@@ -17,7 +17,7 @@ def train():
     set_seed(42)
     # load model and tokenizer
     # MODEL_NAME = "bert-base-uncased"
-    MODEL_NAME = "klue/bert-base"
+    MODEL_NAME = "klue/roberta-large"
     TRAIN_PATH = "../dataset/train/train.csv"
     LABEL_CNT = 30
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
@@ -66,7 +66,7 @@ def train():
       save_steps=500,                 # model saving step.
       num_train_epochs=20,              # total number of training epochs
       learning_rate=5e-5,               # learning_rate
-      per_device_train_batch_size=32,  # batch size per device during training
+      per_device_train_batch_size=16,  # batch size per device during training
       per_device_eval_batch_size=32,   # batch size for evaluation
       warmup_steps=500,                # number of warmup steps for learning rate scheduler
       weight_decay=0.01,               # strength of weight decay

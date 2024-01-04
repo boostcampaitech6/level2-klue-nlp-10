@@ -4,8 +4,8 @@ from sklearn.model_selection import train_test_split
 
 # Train/Test Split
 class Spliter:
-
-    def random_split(train_path:str, dev_ratio:float=0.1, random_state:int=42, shuffle:bool=True)-> tuple[pd.DataFrame, pd.DataFrame]:
+# -> tuple[pd.DataFrame, pd.DataFrame]
+    def random_split(train_path:str, dev_ratio:float=0.1, random_state:int=42, shuffle:bool=True):
         """Random train test split"""
         dataset = pd.read_csv(train_path)
         # random split
@@ -19,7 +19,7 @@ class Spliter:
         return train_dataset, val_dataset
     
 
-    def stratified_split(train_path:str, dev_ratio:float=0.1, stratify:str='label', random_state:int=42, shuffle:bool=True)-> tuple[pd.DataFrame, pd.DataFrame]:
+    def stratified_split(train_path:str, dev_ratio:float=0.1, stratify:str='label', random_state:int=42, shuffle:bool=True):
         """Stratified train test split"""
         dataset = pd.read_csv(train_path)
         # stratified_split
