@@ -9,8 +9,8 @@ import numpy as np
 import argparse
 from tqdm import tqdm
 
-from datasets import RE_Dataset, tokenized_dataset
-from preprocessing import Preprocessor, Prompt
+from datasets import RE_Dataset
+from preprocessing import Preprocessor, Prompt, tokenized_dataset
 from utils import set_seed, num_to_label
 from model import BaseModel
 

@@ -3,11 +3,11 @@ import pandas as pd
 import torch
 import numpy as np
 from transformers import AutoTokenizer, AutoConfig, AutoModelForSequenceClassification, Trainer, TrainingArguments
-from datasets import RE_Dataset, tokenized_dataset
+from datasets import RE_Dataset
 import numpy as np
 
 
-from preprocessing import Preprocessor, Prompt
+from preprocessing import Preprocessor, Prompt, tokenized_dataset
 from metrics import compute_metrics
 from utils import set_seed, label_to_num
 from split_data import Spliter
@@ -21,7 +21,7 @@ def train():
     TRAIN_PATH = "../dataset/train/train.csv"
     LABEL_CNT = 30
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
-    
+
     # [TODO] KFold 용 load dataset 및 구조 구상
     # Train Dev Split
     train_dataset, dev_dataset = Spliter.stratified_split(TRAIN_PATH)
