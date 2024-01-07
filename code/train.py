@@ -2,10 +2,9 @@ import pickle as pickle
 import pandas as pd
 import torch
 import numpy as np
-from transformers import AutoTokenizer, AutoConfig, AutoModelForSequenceClassification, Trainer, TrainingArguments
+from transformers import AutoTokenizer, AutoConfig, AutoModelForSequenceClassification, Trainer, TrainingArguments, EarlyStoppingCallback
 from datasets import RE_Dataset
 import numpy as np
-
 
 from preprocessing import Preprocessor, Prompt, tokenized_dataset
 from metrics import compute_metrics
@@ -13,8 +12,10 @@ from utils import set_seed, label_to_num
 from split_data import Spliter
 from model import BaseModel
 
+
 def train():
-    set_seed(42)
+    SEED = 42
+    set_seed(SEED)
     # load model and tokenizer
     # MODEL_NAME = "bert-base-uncased"
     MODEL_NAME = "klue/roberta-large"
@@ -22,9 +23,10 @@ def train():
     LABEL_CNT = 30
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 
-    # [TODO] KFold 용 load dataset 및 구조 구상
-    # Train Dev Split
-    train_dataset, dev_dataset = Spliter.stratified_split(TRAIN_PATH)
+
+    # No split으로 수정
+    train_dataset, dev_dataset = Spliter.no_split(TRAIN_PATH)
+
     # Train, Dev Prompt 생성
     train_prompt = Prompt.sub_sep_obj_prompt(train_dataset)
     dev_prompt = Prompt.sub_sep_obj_prompt(dev_dataset)
@@ -55,18 +57,17 @@ def train():
     print(model.model.config)
     model.parameters
     model.to(device)
-    
 
 
     # 사용한 option 외에도 다양한 option들이 있습니다.
     # https://huggingface.co/transformers/main_classes/trainer.html#trainingarguments 참고해주세요.
     training_args = TrainingArguments(
       output_dir='./results',          # output directory
-      save_total_limit=2,              # number of total save model.
+      save_total_limit=1,              # number of total save model.
       save_steps=500,                 # model saving step.
-      num_train_epochs=20,              # total number of training epochs
+      num_train_epochs=12,              # total number of training epochs
       learning_rate=5e-5,               # learning_rate
-      per_device_train_batch_size=16,  # batch size per device during training
+      per_device_train_batch_size=32,  # batch size per device during training
       per_device_eval_batch_size=32,   # batch size for evaluation
       warmup_steps=500,                # number of warmup steps for learning rate scheduler
       weight_decay=0.01,               # strength of weight decay
@@ -80,20 +81,23 @@ def train():
       load_best_model_at_end = True 
     )
 
+
     trainer = Trainer(
       model=model,                         # the instantiated 🤗 Transformers model to be trained
       args=training_args,                  # training arguments, defined above
       train_dataset=re_train_dataset,         # training dataset
       eval_dataset=re_dev_dataset,             # evaluation dataset
-      compute_metrics=compute_metrics         # define metrics function
+      compute_metrics=compute_metrics,         # define metrics function
+      callbacks = [EarlyStoppingCallback(early_stopping_patience=3)]  # early_stopping 
+      # early stopping사용을 원하지 않는다면 그냥 callbacks 줄을 주석 처리 하면됨
     )
-
+  
     # train model
     trainer.train()
+    # git에 올린 코드
     model_state_dict = model.state_dict()
     torch.save({'model_state_dict' : model_state_dict}, './best_model/bestmodel.pth')
-
-
+    
 def main():
     train()
 

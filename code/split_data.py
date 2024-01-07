@@ -5,6 +5,11 @@ from sklearn.model_selection import train_test_split
 # Train/Test Split
 class Spliter:
 # -> tuple[pd.DataFrame, pd.DataFrame]
+    def no_split(train_path:str):
+        dataset = pd.read_csv(train_path)
+        return dataset, dataset
+
+    
     def random_split(train_path:str, dev_ratio:float=0.1, random_state:int=42, shuffle:bool=True):
         """Random train test split"""
         dataset = pd.read_csv(train_path)

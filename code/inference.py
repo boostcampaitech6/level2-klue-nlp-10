@@ -51,7 +51,7 @@ def main(args):
   set_seed(42)
   device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
   # load tokenizer
-  MODEL_NAME = "klue/bert-base"
+  MODEL_NAME = "klue/roberta-large"
   TEST_PATH = "../dataset/test/test_data.csv"
   LABEL_CNT = 30
   tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
