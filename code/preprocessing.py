@@ -122,8 +122,9 @@ class Preprocessor:
 
     def typed_entity_marker(self, dataset:pd.DataFrame, tokenizer, add_question=True):
         """
-        Before : 이순신은 조선의 무신이다.
-        After  : <S:PERSON> 이순신 </S:PERSON>은 조선의 <O:JOB> 무신 </O:JOB>이다.
+        Before   : 이순신은 조선의 무신이다.
+        After    : <S:PERSON> 이순신 </S:PERSON>은 조선의 <O:JOB> 무신 </O:JOB>이다.
+        Question : <S:PERSON> 이순신 </S:PERSON>은 조선의 <O:JOB> 무신 </O:JOB>이다. <S:PERSON> 이순신 </S:PERSON>와 <O:JOB> 무신 </O:JOB>은 어떤 관계입니까?
         """
         new_token, change_sentences = set(), [] 
 
