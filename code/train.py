@@ -25,8 +25,9 @@ def train():
                 'preprocess_method' : 'typed_entity_marker_punct', # ['baseline_preprocessor', 'entity_mask', 'entity_marker', 'entity_marker_punct', 'typed_entity_marker', 'typed_entity_marker_punct']
                 'and_marker' : '와',      # ['와', '그리고', '&', '[SEP]']
                 'add_question' : True,    # sentence 뒷 부분에 "sub_e 와 obj_e의 관계는 무엇입니까?""
-                'only_sentence' : False}  # True : (prompt + sentence) / False : (sentence)
+                'only_sentence' : False}  # True : (sentence) / False : (prompt + sentence) 
     
+
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 
     # No split으로 수정
@@ -49,7 +50,7 @@ def train():
     # tokenizing dataset
     tokenized_train = tokenized_dataset(tokenizer, train_prompt, train_sentence, only_sentence=P_CONFIG['only_sentence'])
     tokenized_dev = tokenized_dataset(tokenizer, dev_prompt, dev_sentence, only_sentence=P_CONFIG['only_sentence'])
-
+    
     # make dataset for pytorch.
     re_train_dataset = RE_Dataset(tokenized_train, train_label)
     re_dev_dataset = RE_Dataset(tokenized_dev, dev_label)
