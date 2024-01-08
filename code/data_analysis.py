@@ -11,6 +11,9 @@ import json
 train_path = '../dataset/train/train.csv'
 train_df = pd.read_csv(train_path)
 
+test_path = '../dataset/test/test_data.csv'
+test_df = pd.read_csv(test_path)
+
 # %%
 # subj_entity의 라벨 종류 및 분포 / obj_entity의 라벨 종류 및 분포
 
@@ -47,6 +50,44 @@ def visualize_obj_label(train_df):
 
 visualize_subj_label(train_df)
 visualize_obj_label(train_df)
+
+#%%
+
+# test data에서 subj_entity의 라벨 종류 및 분포 / obj_entity의 라벨 종류 및 분포
+
+def visualize_subj_label(train_df):
+    train_df['subject_entity'] = train_df['subject_entity'].apply(eval)
+    subj_label_df = pd.DataFrame(train_df['subject_entity'].apply(lambda x: x['type']).value_counts()).reset_index()
+    subj_label_df.columns = ['subj_label', 'counts']
+    print(subj_label_df)
+
+    label = subj_label_df['subj_label']
+    counts = subj_label_df['counts']
+
+    plt.figure(figsize=(3, 3))
+    plt.bar(label, counts, width=0.1, color='green')
+    plt.xlabel('Label')
+    plt.ylabel('Counts')
+    plt.show()
+
+def visualize_obj_label(train_df):
+    train_df['object_entity'] = train_df['object_entity'].apply(eval)
+    obj_label_df = pd.DataFrame(train_df['object_entity'].apply(lambda x: x['type']).value_counts()).reset_index()
+    obj_label_df.columns = ['obj_label', 'counts']
+    print(obj_label_df)
+
+    label = obj_label_df['obj_label']
+    counts = obj_label_df['counts']
+
+    plt.figure(figsize=(12, 10))
+    plt.bar(label, counts, width=0.1, color='red')
+    plt.xlabel('Label')
+    plt.ylabel('Counts')
+    plt.show()
+
+
+visualize_subj_label(test_df)
+visualize_obj_label(test_df)
 
 # %%
 # relation 시각화
@@ -119,5 +160,31 @@ def find_outlier(train_df):
     
 
 find_outlier(train_df)
+
+# %%
+
+# 중복 검출
+def detect_duplicated(train_df):
+    sentence_dup = train_df[train_df['sentence'].duplicated(keep=False)].sort_values('subject_entity')
+    print(len(sentence_dup))
+
+    subject_entity_dup = train_df[train_df['subject_entity'].duplicated(keep=False)].sort_values('subject_entity')
+    print(len(subject_entity_dup))
+
+    object_entity_dup = train_df[train_df['object_entity'].duplicated(keep=False)].sort_values('subject_entity')
+    print(len(object_entity_dup))
+
+    train_df['subject_entity'] = tuple(train_df['subject_entity'])
+    train_df['object_entity'] = tuple(train_df['object_entity'])
+    dup = train_df[train_df[['sentence', 'subject_entity', 'object_entity']].duplicated(keep=False)].sort_values('subject_entity')
+    print('길이', len(dup))
+    print(dup['sentence'])
+
+    print('라벨만 다른 경우')
+    filtered_df = dup[dup[['sentence', 'subject_entity', 'object_entity']].duplicated(keep=False) & ~dup['label'].duplicated(keep=False)]
+    print(filtered_df)
+
+
+detect_duplicated(train_df)
 
 # %%
