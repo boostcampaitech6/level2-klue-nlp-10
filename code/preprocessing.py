@@ -1,17 +1,180 @@
 import pandas as pd
 from typing import List
+from ast import literal_eval
+from tqdm import tqdm
+
 
 class Preprocessor:
     """dataset 내의 `sentence`를 전처리하는 class"""
-    def baseline_preprocessor(dataset:pd.DataFrame):
-        """baseline 코드에서 dataset의 sentence 라벨에는 전처리가 들어가 있지 않음."""
-        return list(dataset['sentence'])
+    
+    def make_sentence(self, sentence, sub_e_info, sub_e_marker, obj_e_info, obj_e_marker, add_question):
+        """ 주어진 문장, entity, marker를 활용하여 새로운 sentence를 생성하는 메서드"""
+        # Sentence : ... [object_entity] ... [subject_entity] ...
+        if sub_e_info['end_idx'] > obj_e_info['end_idx']:
+            sentence = sentence[:obj_e_info['start_idx']] + obj_e_marker + sentence[obj_e_info['end_idx']+1 :sub_e_info['start_idx']] + sub_e_marker + sentence[sub_e_info['end_idx']+1 :]
+        
+        # Sentence : ... [subject_entity] ... [object_entity]
+        else:
+            sentence = sentence[:sub_e_info['start_idx']] + sub_e_marker + sentence[sub_e_info['end_idx']+1 :obj_e_info['start_idx']] + obj_e_marker + sentence[obj_e_info['end_idx']+1 :]
+            
+        # 뒤에 붙는 Prompt : Question 
+        if add_question:
+            sentence += f" {sub_e_marker}와 {obj_e_marker}는 어떤 관계입니까?" 
+        
+        return sentence
 
-    def custom_preprocessor(dataset:pd.DataFrame):
-        """sentence에 전처리를 적용하는 메서드."""
-        pass
+    def baseline_preprocessor(self, dataset:pd.DataFrame, tokenizer, add_question=True):
+        """
+        Before   : 이순신은 조선의 무신이다.
+        After    : 이순신은 조선의 무신이다.
+        Question : 이순신은 조선의 무신이다. 이순신와 무신는 어떤 관계입니까? 
+        """
+        change_sentences = []
+
+        for i in tqdm(range(len(dataset)), desc = 'Preprocessor - no marker working ...!!'):
+            sub_e, obj_e = literal_eval(dataset['subject_entity'][i])['word'], literal_eval(dataset['object_entity'][i])['word']
+            sentence = dataset['sentence'][i]
+
+            if add_question:
+                sentence += f" {sub_e}와 {obj_e}는 어떤 관계입니까?"
+
+            change_sentences.append(sentence)    
+        return change_sentences, tokenizer
+    
+
+    def entity_mask(self, dataset:pd.DataFrame, tokenizer, add_question=True):
+        """
+        Before   : 이순신은 조선의 무신이다.
+        After    : [SUB-PER]은 조선의 [OBJ-JOB] 이다.
+        Question : [SUB-PER]은 조선의 [OBJ-JOB] 이다. [SUB-PER]와 [OBJ-JOB]는 어떤 관계입니까?  
+        """
+        new_token, change_sentences = set(), [] 
+
+        for i in tqdm(range(len(dataset)), desc = 'Preprocessor - entity mask working ...!!'):
+            sub_e_info, obj_e_info = literal_eval(dataset['subject_entity'][i]), literal_eval(dataset['object_entity'][i])
+            sub_e_mask, obj_e_mask = f"[SUBJ-{sub_e_info['type'].upper()}]", f"[OBJ-{obj_e_info['type'].upper()}]"
+            sentence = dataset['sentence'][i]
+            
+            # new sentence 생성
+            sentence = self.make_sentence(sentence, sub_e_info, sub_e_mask, obj_e_info, obj_e_mask, add_question)
+            change_sentences.append(sentence)
+
+            # 신규 토큰 추가.
+            new_token.add(sub_e_mask)
+            new_token.add(obj_e_mask)
+        
+        add_tokens = new_token - set(tokenizer.vocab.keys())
+        print(f'Added New Token Cnt : {len(add_tokens)} List : {add_tokens}')
+        tokenizer.add_tokens(list(add_tokens))
+        
+        return change_sentences, tokenizer
+    
+
+    def entity_marker(self, dataset:pd.DataFrame, tokenizer, add_question=True):
+        """
+        Before : 이순신은 조선의 무신이다. 
+        After  : [E1] 이순신 [/E1]은 조선의 [E2] 무신 [/E2]이다.
+        Question : [E1] 이순신 [/E1]은 조선의 [E2] 무신 [/E2]이다. [E1] 이순신 [/E1]와 [E2] 무신 [/E2]는 어떤 관계입니까?  
+        """
+        new_token, change_sentences = set(['[E1]', '[/E1]', '[E2]', '[/E2]']), []
+
+        for i in tqdm(range(len(dataset)), desc = 'Preprocessor - entity marker working ...!!'):
+            sub_e_info, obj_e_info = literal_eval(dataset['subject_entity'][i]), literal_eval(dataset['object_entity'][i])
+            sub_e_marker, obj_e_marker =  f"[E1] {sub_e_info['word']} [/E1]", f"[E2] {obj_e_info['word']} [/E2]"
+            sentence = dataset['sentence'][i]
+
+            # new sentence 생성
+            sentence = self.make_sentence(sentence, sub_e_info, sub_e_marker, obj_e_info, obj_e_marker, add_question)
+            change_sentences.append(sentence)
+
+        # token 추가
+        add_tokens = new_token - set(tokenizer.vocab.keys())
+        print(f'Added New Token Cnt : {len(add_tokens)} List : {add_tokens}')
+        tokenizer.add_tokens(list(add_tokens))
+
+        return change_sentences, tokenizer
+    
+
+    def entity_marker_punct(self, dataset:pd.DataFrame, tokenizer, add_question=True):
+        """
+        Before  : 이순신은 조선의 무신이다.
+        After   : @ 이순신 @ 은 조선의 # 무신 # 이다.
+        Qestion : @ 이순신 @ 은 조선의 # 무신 # 이다. @ 이순신 @와 # 무신 #은 어떤 관계입니까? 
+        """
+        new_token, change_sentences = set(['@', '#']), []
+
+        for i in tqdm(range(len(dataset)), desc = 'Preprocessor - entity marker punct working ...!!'):
+            sub_e_info, obj_e_info = literal_eval(dataset['subject_entity'][i]), literal_eval(dataset['object_entity'][i])
+            sub_e_marker, obj_e_marker =  f"@ {sub_e_info['word']} @", f"# {obj_e_info['word']} #"
+            sentence = dataset['sentence'][i]
+
+            # new sentence 생성
+            sentence = self.make_sentence(sentence, sub_e_info, sub_e_marker, obj_e_info, obj_e_marker, add_question)
+            change_sentences.append(sentence)
+
+        # token 추가
+        add_tokens = new_token - set(tokenizer.vocab.keys())
+        print(f'Added New Token Cnt : {len(add_tokens)} List : {add_tokens}')
+        tokenizer.add_tokens(list(add_tokens))
+
+        return change_sentences, tokenizer
+    
+
+    def typed_entity_marker(self, dataset:pd.DataFrame, tokenizer, add_question=True):
+        """
+        Before   : 이순신은 조선의 무신이다.
+        After    : <S:PERSON> 이순신 </S:PERSON>은 조선의 <O:JOB> 무신 </O:JOB>이다.
+        Question : <S:PERSON> 이순신 </S:PERSON>은 조선의 <O:JOB> 무신 </O:JOB>이다. <S:PERSON> 이순신 </S:PERSON>와 <O:JOB> 무신 </O:JOB>은 어떤 관계입니까?
+        """
+        new_token, change_sentences = set(), [] 
+
+        for i in tqdm(range(len(dataset)), desc = 'Preprocessor - typed entity marker working ...!!'):
+            sub_e_info, obj_e_info = literal_eval(dataset['subject_entity'][i]), literal_eval(dataset['object_entity'][i])
+            sub_e_marker, obj_e_marker =  f"<S:{sub_e_info['type'].upper()}> {sub_e_info['word']} </S:{sub_e_info['type'].upper()}>", f"<O:{obj_e_info['type'].upper()}> {obj_e_info['word']} </O:{sub_e_info['type'].upper()}>"
+            sentence = dataset['sentence'][i]
+            
+            # new sentence 생성
+            sentence = self.make_sentence(sentence, sub_e_info, sub_e_marker, obj_e_info, obj_e_marker, add_question)
+            change_sentences.append(sentence)
+
+            # 신규 토큰 추가.
+            new_token = new_token | set([f"<S:{sub_e_info['type'].upper()}>", f"</S:{sub_e_info['type'].upper()}>", f"<O:{obj_e_info['type'].upper()}>", f"</O:{obj_e_info['type'].upper()}>"])
+            
+        
+        add_tokens = new_token - set(tokenizer.vocab.keys())
+        print(f'Added New Token Cnt : {len(add_tokens)} List : {add_tokens}')
+        tokenizer.add_tokens(list(add_tokens))
+        
+        return change_sentences, tokenizer
 
 
+        
+    def typed_entity_marker_punct(self, dataset:pd.DataFrame, tokenizer, add_question=True):
+        """
+        Before : 이순신은 조선의 무신이다.
+        After  : @ * 사람 * 이순신 @은 조선의 # ^ 직업 ^ 무신 # 이다.
+        Qestion : @ * 사람 * 이순신 @은 조선의 # ^ 직업 ^ 무신 # 이다. @ * 사람 * 이순신 @와 # ^ 직업 ^ 무신 #은 어떤 관계입니까? 
+        """
+        # ORG(조직), PER(인물), DAT(날짜), LOC(지명), POH(기타), NOH(기타 수량 표현) 
+        mapper = {'ORG' : '조직', 'PER' : '인물', 'DAT' : '날짜', 'LOC' : '지역', 'POH' : '기타', 'NOH' : 'noh'}
+        
+        new_token, change_sentences = set(['@', '#', '*', '^'] + list(mapper.values())), []
+
+        for i in tqdm(range(len(dataset)), desc = 'Preprocessor - typed entity marker punct working ...!!'):
+            sub_e_info, obj_e_info = literal_eval(dataset['subject_entity'][i]), literal_eval(dataset['object_entity'][i])
+            sub_e_marker, obj_e_marker =  f"@ * {mapper[sub_e_info['type']]} * {sub_e_info['word']} @", f"# ^ {mapper[obj_e_info['type']]} ^ {obj_e_info['word']} #"
+            sentence = dataset['sentence'][i]
+
+            # new sentence 생성
+            sentence = self.make_sentence(sentence, sub_e_info, sub_e_marker, obj_e_info, obj_e_marker, add_question)
+            change_sentences.append(sentence)
+
+        # token 추가
+        add_tokens = new_token - set(tokenizer.vocab.keys())
+        print(f'Added New Token Cnt : {len(add_tokens)} List : {add_tokens}')
+        tokenizer.add_tokens(list(add_tokens))
+
+        return change_sentences, tokenizer
 
 class Prompt:
     """dataset 내의 `subject_entity`와 `object_entity`를 활용하여 prompt를 생성하는 class"""

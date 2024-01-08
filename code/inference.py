@@ -60,16 +60,20 @@ def main(args):
   test_dataset = pd.read_csv(TEST_PATH)
   # Test dataset Prompt 생성
   test_prompt = Prompt.sub_sep_obj_prompt(test_dataset)
+  
   # Test dataset Sentence 전처리
-  test_sentence = Preprocessor.baseline_preprocessor(test_dataset)
+  preprocessor = Preprocessor()
+  test_sentence, tokenizer = preprocessor.baseline_preprocessor(test_dataset, tokenizer, add_question=False)
+  
   # tokenizing Test dataset
   tokenized_test = tokenized_dataset(tokenizer, test_prompt, test_sentence)
+  
   # Test label 준비
   test_label = list(map(int, test_dataset['label'].values))
   re_test_dataset = RE_Dataset(tokenized_test , test_label)
 
-  ## load my model
-  model = BaseModel(model_name=MODEL_NAME, label_cnt=LABEL_CNT)
+  ## load my model - tokenizer 추가
+  model = BaseModel(model_name=MODEL_NAME, label_cnt=LABEL_CNT, tokenizer=tokenizer)
   checkpoint = torch.load(args.model_path)
   model.load_state_dict(checkpoint['model_state_dict'])
   model.parameters
