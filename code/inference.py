@@ -54,19 +54,26 @@ def main(args):
   MODEL_NAME = "klue/roberta-large"
   TEST_PATH = "../dataset/test/test_data.csv"
   LABEL_CNT = 30
+  P_CONFIG = {'prompt_kind' : 's_and_o',
+                'preprocess_method' : 'typed_entity_marker_punct',
+                'and_marker' : '와',
+                'add_question' : True,
+                'only_sentence' : False} 
+  
   tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 
   ## load test datset
   test_dataset = pd.read_csv(TEST_PATH)
   # Test dataset Prompt 생성
-  test_prompt = Prompt.sub_sep_obj_prompt(test_dataset)
+  prompt = Prompt()
+  test_prompt = prompt.make_prompt(test_dataset, kind=P_CONFIG['prompt_kind'], marker=P_CONFIG['preprocess_method'], and_marker=P_CONFIG['and_marker'])
   
   # Test dataset Sentence 전처리
   preprocessor = Preprocessor()
-  test_sentence, tokenizer = preprocessor.baseline_preprocessor(test_dataset, tokenizer, add_question=False)
-  
+  test_sentence, tokenizer = getattr(preprocessor, P_CONFIG['preprocess_method'])(test_dataset, tokenizer, add_question=P_CONFIG['add_question'], and_marker=P_CONFIG['and_marker'])
+
   # tokenizing Test dataset
-  tokenized_test = tokenized_dataset(tokenizer, test_prompt, test_sentence)
+  tokenized_test = tokenized_dataset(tokenizer, test_prompt, test_sentence, only_sentence=P_CONFIG['only_sentence'])
   
   # Test label 준비
   test_label = list(map(int, test_dataset['label'].values))
