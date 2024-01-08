@@ -21,29 +21,36 @@ def train():
     MODEL_NAME = "klue/roberta-large"
     TRAIN_PATH = "../dataset/train/train.csv"
     LABEL_CNT = 30
-    tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+    P_CONFIG = {'prompt_kind' : 's_and_o',  # ['s_sep_o', 's_and_o', 'quiz']
+                'preprocess_method' : 'typed_entity_marker_punct', # ['baseline_preprocessor', 'entity_mask', 'entity_marker', 'entity_marker_punct', 'typed_entity_marker', 'typed_entity_marker_punct']
+                'and_marker' : '와',      # ['와', '그리고', '&', '[SEP]']
+                'add_question' : True,    # sentence 뒷 부분에 "sub_e 와 obj_e의 관계는 무엇입니까?""
+                'only_sentence' : False}  # True : (sentence) / False : (prompt + sentence) 
+    
 
+    tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 
     # No split으로 수정
     train_dataset, dev_dataset = Spliter.no_split(TRAIN_PATH)
 
     # Train, Dev Prompt 생성
-    train_prompt = Prompt.sub_sep_obj_prompt(train_dataset)
-    dev_prompt = Prompt.sub_sep_obj_prompt(dev_dataset)
+    prompt = Prompt()
+    train_prompt = prompt.make_prompt(train_dataset, kind=P_CONFIG['prompt_kind'], marker=P_CONFIG['preprocess_method'], and_marker=P_CONFIG['and_marker'])
+    dev_prompt = prompt.make_prompt(dev_dataset, kind=P_CONFIG['prompt_kind'], marker=P_CONFIG['preprocess_method'], and_marker=P_CONFIG['and_marker'])
 
     # Train, Dev 전처리
     preprocessor = Preprocessor()
-    train_sentence, tokenizer = preprocessor.baseline_preprocessor(train_dataset, tokenizer, add_question=False)
-    dev_sentence, tokenizer = preprocessor.baseline_preprocessor(dev_dataset, tokenizer, add_question=False)
+    train_sentence, tokenizer = getattr(preprocessor, P_CONFIG['preprocess_method'])(train_dataset, tokenizer, add_question=P_CONFIG['add_question'], and_marker=P_CONFIG['and_marker'])
+    dev_sentence, tokenizer = getattr(preprocessor, P_CONFIG['preprocess_method'])(dev_dataset, tokenizer, add_question=P_CONFIG['add_question'], and_marker=P_CONFIG['and_marker'])
 
     # Train, Dev 라벨 생성
     train_label = label_to_num(train_dataset['label'].values)
     dev_label = label_to_num(dev_dataset['label'].values)
 
     # tokenizing dataset
-    tokenized_train = tokenized_dataset(tokenizer, train_prompt, train_sentence)
-    tokenized_dev = tokenized_dataset(tokenizer, dev_prompt, dev_sentence)
-
+    tokenized_train = tokenized_dataset(tokenizer, train_prompt, train_sentence, only_sentence=P_CONFIG['only_sentence'])
+    tokenized_dev = tokenized_dataset(tokenizer, dev_prompt, dev_sentence, only_sentence=P_CONFIG['only_sentence'])
+    
     # make dataset for pytorch.
     re_train_dataset = RE_Dataset(tokenized_train, train_label)
     re_dev_dataset = RE_Dataset(tokenized_dev, dev_label)
