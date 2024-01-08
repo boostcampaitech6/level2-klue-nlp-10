@@ -2,7 +2,7 @@ import pickle as pickle
 import pandas as pd
 import torch
 import numpy as np
-from transformers import AutoTokenizer, AutoConfig, AutoModelForSequenceClassification, Trainer, TrainingArguments
+from transformers import AutoTokenizer, AutoConfig, AutoModelForSequenceClassification, Trainer, TrainingArguments, EarlyStoppingCallback
 from datasets import RE_Dataset
 import numpy as np
 
@@ -81,12 +81,15 @@ def train():
       load_best_model_at_end = True 
     )
 
+
     trainer = Trainer(
       model=model,                         # the instantiated 🤗 Transformers model to be trained
       args=training_args,                  # training arguments, defined above
       train_dataset=re_train_dataset,         # training dataset
       eval_dataset=re_dev_dataset,             # evaluation dataset
-      compute_metrics=compute_metrics         # define metrics function
+      compute_metrics=compute_metrics,         # define metrics function
+      callbacks = [EarlyStoppingCallback(early_stopping_patience=3)]  # early_stopping 
+      # early stopping사용을 원하지 않는다면 그냥 callbacks 줄을 주석 처리 하면됨
     )
   
     # train model
