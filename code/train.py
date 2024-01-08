@@ -32,8 +32,9 @@ def train():
     dev_prompt = Prompt.sub_sep_obj_prompt(dev_dataset)
 
     # Train, Dev 전처리
-    train_sentence = Preprocessor.baseline_preprocessor(train_dataset)
-    dev_sentence = Preprocessor.baseline_preprocessor(dev_dataset)
+    preprocessor = Preprocessor()
+    train_sentence, tokenizer = preprocessor.baseline_preprocessor(train_dataset, tokenizer, add_question=False)
+    dev_sentence, tokenizer = preprocessor.baseline_preprocessor(dev_dataset, tokenizer, add_question=False)
 
     # Train, Dev 라벨 생성
     train_label = label_to_num(train_dataset['label'].values)
@@ -52,12 +53,11 @@ def train():
     
 
     # setting model hyperparameter
-    model = BaseModel(model_name=MODEL_NAME, label_cnt=LABEL_CNT)
+    model = BaseModel(model_name=MODEL_NAME, label_cnt=LABEL_CNT, tokenizer=tokenizer)
     print('MODEL CONFIG')
     print(model.model.config)
     model.parameters
     model.to(device)
-
 
     # 사용한 option 외에도 다양한 option들이 있습니다.
     # https://huggingface.co/transformers/main_classes/trainer.html#trainingarguments 참고해주세요.
@@ -65,7 +65,7 @@ def train():
       output_dir='./results',          # output directory
       save_total_limit=1,              # number of total save model.
       save_steps=500,                 # model saving step.
-      num_train_epochs=12,              # total number of training epochs
+      num_train_epochs=3,              # total number of training epochs
       learning_rate=5e-5,               # learning_rate
       per_device_train_batch_size=32,  # batch size per device during training
       per_device_eval_batch_size=32,   # batch size for evaluation
