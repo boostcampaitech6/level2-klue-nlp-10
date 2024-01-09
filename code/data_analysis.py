@@ -14,6 +14,9 @@ train_df = pd.read_csv(train_path)
 test_path = '../dataset/test/test_data.csv'
 test_df = pd.read_csv(test_path)
 
+augmented_path = '../dataset/train/augmented_train.csv'
+augmented_df = pd.read_csv(augmented_path)
+
 # %%
 # subj_entity의 라벨 종류 및 분포 / obj_entity의 라벨 종류 및 분포
 
@@ -48,8 +51,8 @@ def visualize_obj_label(train_df):
     plt.show()
 
 
-visualize_subj_label(train_df)
-visualize_obj_label(train_df)
+visualize_subj_label(augmented_df)
+visualize_obj_label(augmented_df)
 
 #%%
 
@@ -106,7 +109,7 @@ def visualize_relation(train_df):
     plt.xlabel('Counts')
     plt.show()
 
-visualize_relation(train_df)
+visualize_relation(augmented_df)
 
 # %%
 # sentence 길이 시각화
@@ -132,7 +135,7 @@ def visualize_sentence_len(train_df):
     plt.ylabel('Counts', fontsize=40)
     #plt.show()
 
-visualize_sentence_len(train_df)
+visualize_sentence_len(augmented_df)
 
 # %%
 # outlier 구간 찾기
@@ -185,6 +188,6 @@ def detect_duplicated(train_df):
     print(filtered_df)
 
 
-detect_duplicated(train_df)
+detect_duplicated(augmented_df)
 
 # %%
