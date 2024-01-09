@@ -11,6 +11,7 @@ from metrics import compute_metrics
 from utils import set_seed, label_to_num
 from split_data import Spliter
 from model import BaseModel
+from trainer import CustomTrainer
 
 
 def train():
@@ -24,9 +25,10 @@ def train():
     LABEL_CNT = 30
     P_CONFIG = {'prompt_kind' : 's_and_o',  # ['s_sep_o', 's_and_o', 'quiz']
                 'preprocess_method' : 'typed_entity_marker_punct', # ['baseline_preprocessor', 'entity_mask', 'entity_marker', 'entity_marker_punct', 'typed_entity_marker', 'typed_entity_marker_punct']
-                'and_marker' : '와',      # ['와', '그리고', '&', '[SEP]']
-                'add_question' : True,    # sentence 뒷 부분에 "sub_e 와 obj_e의 관계는 무엇입니까?""
-                'only_sentence' : False}  # True : (sentence) / False : (prompt + sentence) 
+                'and_marker' : '와',       # ['와', '그리고', '&', '[SEP]']
+                'add_question' : True,     # sentence 뒷 부분에 "sub_e 와 obj_e의 관계는 무엇입니까?""
+                'only_sentence' : False,   # True : (sentence) / False : (prompt + sentence) 
+                'loss_name' : 'FocalLoss'} # loss fuction 선택: 'CrossEntropy', 'FocalLoss'
     
 
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
@@ -90,8 +92,10 @@ def train():
     )
 
 
-    trainer = Trainer(
+    trainer = CustomTrainer(
       model=model,                         # the instantiated 🤗 Transformers model to be trained
+      loss_name=P_CONFIG['loss_name'],
+      num_labels=LABEL_CNT,
       args=training_args,                  # training arguments, defined above
       train_dataset=re_train_dataset,         # training dataset
       eval_dataset=re_dev_dataset,             # evaluation dataset
