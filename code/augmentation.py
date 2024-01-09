@@ -4,11 +4,13 @@ import numpy as np
 from googletrans import Translator
 from tqdm.auto import tqdm
 import time
+import ast
 
 #%%
 train_path = '../dataset/train/train.csv'
 train_df = pd.read_csv(train_path)
 train_df_len = len(train_df)
+
 
 trans_train_path = '../dataset/train/trans_train.csv'
 trans_train = pd.read_csv(trans_train_path)
@@ -51,11 +53,30 @@ train_df.to_csv('./dataset/train/trans_train.csv', index=False)
 #     test.loc[idx,'sentence_2'] = result
 
 #%%
+
+def filter_row(row):
+    return row['subject_entity']['word'] in row['sentence'] and row['object_entity']['word'] in row['sentence']
+
+print('원래 길이', len(trans_train))
+
+# sentence에 subject entity와 object entity가 있는지
+trans_train['subject_entity'] = trans_train['subject_entity'].apply(ast.literal_eval)
+trans_train['object_entity'] = trans_train['object_entity'].apply(ast.literal_eval)
+trans_train = trans_train[trans_train.apply(filter_row, axis=1)]
+print('sentence에 entity들 있는 거만 남기면', len(trans_train))
+
 smooth_trans = trans_train[(trans_train['label'] != "no_relation") & (trans_train['label'] != "org:top_members/employees") & (trans_train['label'] != "per:employee_of")]
-#augmented_df = pd.merge(train_df, smooth_trans)
+print('smoothing 후 길이', len(smooth_trans))
+
+print('2 len', smooth_trans)
 smooth_trans['id'] = range(1, len(smooth_trans)+1)
 smooth_trans.reset_index(drop=True, inplace=True)
-smooth_trans.to_csv('../dataset/train/smooth_trans.csv', index=False)
+#smooth_trans.to_csv('../dataset/train/smooth_trans.csv', index=False)
+
+# %%
+
+trans_train_path = '../dataset/train/smooth_trans.csv'
+trans_train = pd.read_csv(trans_train_path)
 
 augmented_df = pd.merge(train_df, smooth_trans, how='outer')
 augmented_df['id'] = range(1, len(augmented_df)+1)
