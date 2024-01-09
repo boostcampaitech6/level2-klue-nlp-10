@@ -17,6 +17,7 @@ def train():
     SEED = 42
     set_seed(SEED)
     # load model and tokenizer
+    
     # MODEL_NAME = "bert-base-uncased"
     MODEL_NAME = "klue/roberta-large"
     TRAIN_PATH = "../dataset/train/train.csv"

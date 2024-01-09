@@ -68,6 +68,7 @@ def main(args):
   prompt = Prompt()
   test_prompt = prompt.make_prompt(test_dataset, kind=P_CONFIG['prompt_kind'], marker=P_CONFIG['preprocess_method'], and_marker=P_CONFIG['and_marker'])
   
+  
   # Test dataset Sentence 전처리
   preprocessor = Preprocessor()
   test_sentence, tokenizer = getattr(preprocessor, P_CONFIG['preprocess_method'])(test_dataset, tokenizer, add_question=P_CONFIG['add_question'], and_marker=P_CONFIG['and_marker'])
