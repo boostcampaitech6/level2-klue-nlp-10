@@ -1,13 +1,20 @@
+#%%
 import pandas as pd
 import numpy as np
 from googletrans import Translator
 from tqdm.auto import tqdm
 import time
 
-train_path = './dataset/train/train.csv'
+#%%
+train_path = '../dataset/train/train.csv'
 train_df = pd.read_csv(train_path)
 train_df_len = len(train_df)
 
+trans_train_path = '../dataset/train/trans_train.csv'
+trans_train = pd.read_csv(trans_train_path)
+
+#%%
+# back translation
 translator = Translator()
 
 def google_ko2en2ko(ko_text, translator):
@@ -42,3 +49,16 @@ train_df.to_csv('./dataset/train/trans_train.csv', index=False)
 # for idx, sentence in enumerate(tqdm(sen2_list)):
 #     result =  google_ko2en2ko(sentence, translator)
 #     test.loc[idx,'sentence_2'] = result
+
+#%%
+smooth_trans = trans_train[(trans_train['label'] != "no_relation") & (trans_train['label'] != "org:top_members/employees") & (trans_train['label'] != "per:employee_of")]
+#augmented_df = pd.merge(train_df, smooth_trans)
+smooth_trans['id'] = range(1, len(smooth_trans)+1)
+smooth_trans.reset_index(drop=True, inplace=True)
+smooth_trans.to_csv('../dataset/train/smooth_trans.csv', index=False)
+
+augmented_df = pd.merge(train_df, smooth_trans, how='outer')
+augmented_df['id'] = range(1, len(augmented_df)+1)
+augmented_df.reset_index(drop=True, inplace=True)
+augmented_df.to_csv('../dataset/train/augmented_train.csv', index=False)
+# %%
