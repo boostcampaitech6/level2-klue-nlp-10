@@ -84,7 +84,7 @@ def main(args):
   # 아래 directory와 columns의 형태는 지켜주시기 바랍니다.
   output = pd.DataFrame({'id' : test_dataset['id'],'pred_label':pred_answer,'probs':output_prob,})
 
-  output.to_csv('./prediction/submission.csv', index=False) # 최종적으로 완성된 예측한 라벨 csv 파일 형태로 저장.
+  output.to_csv('./prediction/submission_cv5.csv', index=False) # 최종적으로 완성된 예측한 라벨 csv 파일 형태로 저장.
   #### 필수!! ##############################################
   print('---- Finish! ----')
 
@@ -93,7 +93,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     
     # model dir
-    parser.add_argument('--model_path', type=str, default="./best_model/bestmodel.pth")
+    parser.add_argument('--model_path', type=str, default="./best_model/bestmodel_cv5.pth")
     args = parser.parse_args()
     print(args)
     main(args)

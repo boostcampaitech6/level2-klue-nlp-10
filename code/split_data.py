@@ -8,7 +8,11 @@ class Spliter:
     def no_split(train_path:str):
         dataset = pd.read_csv(train_path)
         return dataset, dataset
-
+    
+    def split_testing(train_path:str):
+        train_dataset = pd.read_csv("/data/ephemeral/level2-klue-nlp-10/dataset/fold5cv/train_cv_5.csv")
+        val_dataset = pd.read_csv("/data/ephemeral/level2-klue-nlp-10/dataset/fold5cv/val_cv_5.csv")
+        return train_dataset, val_dataset
     
     def random_split(train_path:str, dev_ratio:float=0.1, random_state:int=42, shuffle:bool=True):
         """Random train test split"""

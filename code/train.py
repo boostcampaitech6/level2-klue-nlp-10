@@ -12,6 +12,14 @@ from utils import set_seed, label_to_num
 from split_data import Spliter
 from model import BaseModel
 
+import os
+import wandb
+#wandb.init(project="Relation Extraction", 
+#           name='validation_testing', 
+#           )
+
+os.environ["WANDB_PROJECT"] = "validation_testing_cv5"  # name your W&B project
+os.environ["WANDB_LOG_MODEL"] = "checkpoint"  # log all model checkpoints
 
 def train():
     SEED = 42
@@ -25,7 +33,7 @@ def train():
 
 
     # No split으로 수정
-    train_dataset, dev_dataset = Spliter.no_split(TRAIN_PATH)
+    train_dataset, dev_dataset = Spliter.split_testing(TRAIN_PATH)
 
     # Train, Dev Prompt 생성
     train_prompt = Prompt.sub_sep_obj_prompt(train_dataset)
@@ -78,7 +86,8 @@ def train():
                                   # `steps`: Evaluate every `eval_steps`.
                                   # `epoch`: Evaluate every end of epoch.
       eval_steps = 500,            # evaluation step.
-      load_best_model_at_end = True 
+      load_best_model_at_end = True,
+      report_to= "wandb"
     )
 
 
@@ -96,7 +105,7 @@ def train():
     trainer.train()
     # git에 올린 코드
     model_state_dict = model.state_dict()
-    torch.save({'model_state_dict' : model_state_dict}, './best_model/bestmodel.pth')
+    torch.save({'model_state_dict' : model_state_dict}, './best_model/bestmodel_cv5.pth')
     
 def main():
     train()
