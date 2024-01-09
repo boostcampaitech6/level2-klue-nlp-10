@@ -65,7 +65,8 @@ class Preprocessor:
         
         add_tokens = new_token - set(tokenizer.vocab.keys())
         print(f'Added New Token Cnt : {len(add_tokens)} List : {add_tokens}')
-        tokenizer.add_tokens(list(add_tokens))
+        special_tokens_dict = {'additional_special_tokens': list(add_tokens)}
+        tokenizer.add_special_tokens(special_tokens_dict)
         
         return change_sentences, tokenizer
     
@@ -90,7 +91,8 @@ class Preprocessor:
         # token 추가
         add_tokens = new_token - set(tokenizer.vocab.keys())
         print(f'Added New Token Cnt : {len(add_tokens)} List : {add_tokens}')
-        tokenizer.add_tokens(list(add_tokens))
+        special_tokens_dict = {'additional_special_tokens': list(add_tokens)}
+        tokenizer.add_special_tokens(special_tokens_dict)
 
         return change_sentences, tokenizer
     
@@ -115,7 +117,8 @@ class Preprocessor:
         # token 추가
         add_tokens = new_token - set(tokenizer.vocab.keys())
         print(f'Added New Token Cnt : {len(add_tokens)} List : {add_tokens}')
-        tokenizer.add_tokens(list(add_tokens))
+        special_tokens_dict = {'additional_special_tokens': list(add_tokens)}
+        tokenizer.add_special_tokens(special_tokens_dict)
 
         return change_sentences, tokenizer
     
@@ -143,7 +146,8 @@ class Preprocessor:
         
         add_tokens = new_token - set(tokenizer.vocab.keys())
         print(f'Added New Token Cnt : {len(add_tokens)} List : {add_tokens}')
-        tokenizer.add_tokens(list(add_tokens))
+        special_tokens_dict = {'additional_special_tokens': list(add_tokens)}
+        tokenizer.add_special_tokens(special_tokens_dict)
         
         return change_sentences, tokenizer
 
@@ -172,8 +176,9 @@ class Preprocessor:
         # token 추가
         add_tokens = new_token - set(tokenizer.vocab.keys())
         print(f'Added New Token Cnt : {len(add_tokens)} List : {add_tokens}')
-        tokenizer.add_tokens(list(add_tokens))
-
+        special_tokens_dict = {'additional_special_tokens': list(add_tokens)}
+        tokenizer.add_special_tokens(special_tokens_dict)
+        
         return change_sentences, tokenizer
 
 
