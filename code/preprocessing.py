@@ -65,7 +65,7 @@ class Preprocessor:
         
         add_tokens = new_token - set(tokenizer.vocab.keys())
         print(f'Added New Token Cnt : {len(add_tokens)} List : {add_tokens}')
-        special_tokens_dict = {'additional_special_tokens': list(add_tokens)}
+        special_tokens_dict = {'additional_special_tokens': sorted(list(new_token))}
         tokenizer.add_special_tokens(special_tokens_dict)
         
         return change_sentences, tokenizer
@@ -91,7 +91,7 @@ class Preprocessor:
         # token 추가
         add_tokens = new_token - set(tokenizer.vocab.keys())
         print(f'Added New Token Cnt : {len(add_tokens)} List : {add_tokens}')
-        special_tokens_dict = {'additional_special_tokens': list(add_tokens)}
+        special_tokens_dict = {'additional_special_tokens': sorted(list(new_token))}
         tokenizer.add_special_tokens(special_tokens_dict)
 
         return change_sentences, tokenizer
@@ -117,7 +117,7 @@ class Preprocessor:
         # token 추가
         add_tokens = new_token - set(tokenizer.vocab.keys())
         print(f'Added New Token Cnt : {len(add_tokens)} List : {add_tokens}')
-        special_tokens_dict = {'additional_special_tokens': list(add_tokens)}
+        special_tokens_dict = {'additional_special_tokens': sorted(list(new_token))}
         tokenizer.add_special_tokens(special_tokens_dict)
 
         return change_sentences, tokenizer
@@ -129,7 +129,7 @@ class Preprocessor:
         After   : <S:PERSON> 이순신 </S:PERSON>은 조선의 <O:JOB> 무신 </O:JOB>이다.
         Qestion : <S:PERSON> 이순신 </S:PERSON>은 조선의 <O:JOB> 무신 </O:JOB>이다. [SEP] <S:PERSON> 이순신 </S:PERSON> 와 <O:JOB> 무신 </O:JOB>의 관계는 무엇입니까?
         """
-        new_token, change_sentences = set(), [] 
+        new_token, change_sentences = set(['<O:LOC>', '</O:POH>', '</S:PER>', '<O:POH>', '</O:ORG>', '<O:NOH>', '<O:ORG>', '<O:PER>', '</O:PER>', '</S:LOC>', '</O:NOH>', '<S:ORG>', '</O:LOC>', '</S:ORG>', '<S:PER>', '<O:DAT>', '</O:DAT>', '<S:LOC>']), [] 
 
         for i in tqdm(range(len(dataset)), desc = 'Preprocessor - typed entity marker working ...!!'):
             sub_e_info, obj_e_info = literal_eval(dataset['subject_entity'][i]), literal_eval(dataset['object_entity'][i])
@@ -145,8 +145,8 @@ class Preprocessor:
             
         
         add_tokens = new_token - set(tokenizer.vocab.keys())
-        print(f'Added New Token Cnt : {len(add_tokens)} List : {add_tokens}')
-        special_tokens_dict = {'additional_special_tokens': list(add_tokens)}
+        print(f'Added New Token Cnt : {len(new_token)} List : {new_token}')
+        special_tokens_dict = {'additional_special_tokens': sorted(list(new_token))}
         tokenizer.add_special_tokens(special_tokens_dict)
         
         return change_sentences, tokenizer
@@ -176,7 +176,7 @@ class Preprocessor:
         # token 추가
         add_tokens = new_token - set(tokenizer.vocab.keys())
         print(f'Added New Token Cnt : {len(add_tokens)} List : {add_tokens}')
-        special_tokens_dict = {'additional_special_tokens': list(add_tokens)}
+        special_tokens_dict = {'additional_special_tokens': sorted(list(new_token))}
         tokenizer.add_special_tokens(special_tokens_dict)
         
         return change_sentences, tokenizer
