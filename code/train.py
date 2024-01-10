@@ -20,12 +20,12 @@ def train():
     
     # MODEL_NAME = "bert-base-uncased"
     MODEL_NAME = "klue/roberta-large"
-    TRAIN_PATH = "../dataset/train/train.csv"
+    TRAIN_PATH = "../dataset/train/augmented_train1.csv"
     LABEL_CNT = 30
     P_CONFIG = {'prompt_kind' : 's_and_o',  # ['s_sep_o', 's_and_o', 'quiz']
                 'preprocess_method' : 'typed_entity_marker_punct', # ['baseline_preprocessor', 'entity_mask', 'entity_marker', 'entity_marker_punct', 'typed_entity_marker', 'typed_entity_marker_punct']
                 'and_marker' : '와',      # ['와', '그리고', '&', '[SEP]']
-                'add_question' : True,    # sentence 뒷 부분에 "sub_e 와 obj_e의 관계는 무엇입니까?""
+                'add_question' : False,    # sentence 뒷 부분에 "sub_e 와 obj_e의 관계는 무엇입니까?""
                 'only_sentence' : False}  # True : (sentence) / False : (prompt + sentence) 
     
 
@@ -96,7 +96,7 @@ def train():
       train_dataset=re_train_dataset,         # training dataset
       eval_dataset=re_dev_dataset,             # evaluation dataset
       compute_metrics=compute_metrics,         # define metrics function
-      callbacks = [EarlyStoppingCallback(early_stopping_patience=3)]  # early_stopping 
+      # callbacks = [EarlyStoppingCallback(early_stopping_patience=3)]  # early_stopping 
       # early stopping사용을 원하지 않는다면 그냥 callbacks 줄을 주석 처리 하면됨
     )
   
@@ -104,7 +104,7 @@ def train():
     trainer.train()
     # git에 올린 코드
     model_state_dict = model.state_dict()
-    torch.save({'model_state_dict' : model_state_dict}, './best_model/bestmodel.pth')
+    torch.save({'model_state_dict' : model_state_dict}, './best_model/augment1_bestmodel.pth')
     
 def main():
     train()

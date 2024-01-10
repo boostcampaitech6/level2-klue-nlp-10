@@ -14,7 +14,7 @@ train_df = pd.read_csv(train_path)
 test_path = '../dataset/test/test_data.csv'
 test_df = pd.read_csv(test_path)
 
-augmented_path = '../dataset/train/augmented_train.csv'
+augmented_path = '../dataset/train/augmented_train2.csv'
 augmented_df = pd.read_csv(augmented_path)
 
 # %%

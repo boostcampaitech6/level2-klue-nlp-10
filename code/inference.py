@@ -20,7 +20,7 @@ def inference(model, tokenized_sent, device):
     test dataset을 DataLoader로 만들어 준 후,
     batch_size로 나눠 model이 예측 합니다.
   """
-  dataloader = DataLoader(tokenized_sent, batch_size=16, shuffle=False)
+  dataloader = DataLoader(tokenized_sent, batch_size=32, shuffle=False)
   model.eval()
   output_pred = []
   output_prob = []
@@ -57,7 +57,7 @@ def main(args):
   P_CONFIG = {'prompt_kind' : 's_and_o',
                 'preprocess_method' : 'typed_entity_marker_punct',
                 'and_marker' : '와',
-                'add_question' : True,
+                'add_question' : False,
                 'only_sentence' : False} 
   
   tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
