@@ -20,7 +20,7 @@ def train():
     
     # MODEL_NAME = "bert-base-uncased"
     MODEL_NAME = "klue/roberta-large"
-    TRAIN_PATH = "../dataset/train/augmented_train1.csv"
+    TRAIN_PATH = "../dataset/train/augmented_train2.csv"
     LABEL_CNT = 30
     P_CONFIG = {'prompt_kind' : 's_and_o',  # ['s_sep_o', 's_and_o', 'quiz']
                 'preprocess_method' : 'typed_entity_marker_punct', # ['baseline_preprocessor', 'entity_mask', 'entity_marker', 'entity_marker_punct', 'typed_entity_marker', 'typed_entity_marker_punct']
@@ -104,7 +104,7 @@ def train():
     trainer.train()
     # git에 올린 코드
     model_state_dict = model.state_dict()
-    torch.save({'model_state_dict' : model_state_dict}, './best_model/augment1_bestmodel.pth')
+    torch.save({'model_state_dict' : model_state_dict}, './best_model/augment2_bestmodel.pth')
     
 def main():
     train()
