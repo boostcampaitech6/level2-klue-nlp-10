@@ -207,7 +207,7 @@ class Prompt:
             prompt = f"@ {sub_e} @ {and_marker} # {obj_e} #"
         
         elif marker == 'typed_entity_marker':
-            prompt = f"<S:{sub_type.upper()}> {sub_e} </S:{sub_type.upper()}> {and_marker} <O:{obj_type.upper()}> {obj_e['word']} </O:{obj_type.upper()}>"
+            prompt = f"<S:{sub_type.upper()}> {sub_e} </S:{sub_type.upper()}> {and_marker} <O:{obj_type.upper()}> {obj_e} </O:{obj_type.upper()}>"
 
         elif marker == 'typed_entity_marker_punct':
             prompt = f"@ * {mapper[sub_type]} * {sub_e} @ {and_marker} # ^ {mapper[obj_type]} ^ {obj_e} #"
