@@ -6,11 +6,11 @@ from transformers import AutoTokenizer, AutoConfig, AutoModelForSequenceClassifi
 from datasets import RE_Dataset
 import numpy as np
 
-from preprocessing import Preprocessor, Prompt, tokenized_dataset
+from preprocessing import Preprocessor, Prompt, tokenized_dataset, get_entity_loc
 from metrics import compute_metrics
 from utils import set_seed, label_to_num
 from split_data import Spliter
-from model import BaseModel
+from model import BaseModel, MtbModel
 from custom_trainer import CustomTrainer
 
 
@@ -28,8 +28,8 @@ def train():
                 'and_marker' : '와',       # ['와', '그리고', '&', '[SEP]']
                 'add_question' : True,     # sentence 뒷 부분에 "sub_e 와 obj_e의 관계는 무엇입니까?""
                 'only_sentence' : False,   # True : (sentence) / False : (prompt + sentence)
-                'loss_name' : 'FocalLoss'  # loss fuction 선택: 'CrossEntropy', 'FocalLoss'
-                }
+                'loss_name' : 'CrossEntropy',  # loss fuction 선택: 'CrossEntropy', 'FocalLoss'
+                'matching_the_blank' : None} # [None, 'entity_start', 'entity_start_end']
     
 
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
@@ -55,16 +55,27 @@ def train():
     tokenized_train = tokenized_dataset(tokenizer, train_prompt, train_sentence, only_sentence=P_CONFIG['only_sentence'])
     tokenized_dev = tokenized_dataset(tokenizer, dev_prompt, dev_sentence, only_sentence=P_CONFIG['only_sentence'])
     
+    # Matching the blank 사용시 tokenizer에 matching_the_blanks_ids 정보 추가
+    if P_CONFIG['matching_the_blank']:
+        train_entitiy_marker_loc_ids = get_entity_loc(tokenizer=tokenizer, tokenized_sentences = tokenized_train, config=P_CONFIG)
+        dev_entitiy_marker_loc_ids = get_entity_loc(tokenizer=tokenizer, tokenized_sentences = tokenized_dev, config=P_CONFIG)
+        tokenized_train['matching_the_blanks_ids'] = torch.tensor(train_entitiy_marker_loc_ids, dtype=torch.int64)
+        tokenized_dev['matching_the_blanks_ids'] = torch.tensor(dev_entitiy_marker_loc_ids, dtype=torch.int64)
+
+
     # make dataset for pytorch.
     re_train_dataset = RE_Dataset(tokenized_train, train_label)
     re_dev_dataset = RE_Dataset(tokenized_dev, dev_label)
 
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     print('DEVICE : ', device)
-    
+
 
     # setting model hyperparameter
-    model = BaseModel(model_name=MODEL_NAME, label_cnt=LABEL_CNT, tokenizer=tokenizer)
+    if P_CONFIG['matching_the_blank']:
+        model = MtbModel(model_name=MODEL_NAME, label_cnt=LABEL_CNT, tokenizer=tokenizer, mtb_type=P_CONFIG['matching_the_blank'])
+    else:
+        model = BaseModel(model_name=MODEL_NAME, label_cnt=LABEL_CNT, tokenizer=tokenizer)
     print('MODEL CONFIG')
     print(model.model.config)
     model.parameters
