@@ -25,14 +25,14 @@ def train():
     P_CONFIG = {'prompt_kind' : 's_and_o',  # ['s_sep_o', 's_and_o', 'quiz']
                 'preprocess_method' : 'typed_entity_marker_punct', # ['baseline_preprocessor', 'entity_mask', 'entity_marker', 'entity_marker_punct', 'typed_entity_marker', 'typed_entity_marker_punct']
                 'and_marker' : '와',      # ['와', '그리고', '&', '[SEP]']
-                'add_question' : True,    # sentence 뒷 부분에 "sub_e 와 obj_e의 관계는 무엇입니까?""
+                'add_question' : False,    # sentence 뒷 부분에 "sub_e 와 obj_e의 관계는 무엇입니까?""
                 'only_sentence' : False}  # True : (sentence) / False : (prompt + sentence) 
     
 
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 
     # No split으로 수정
-    train_dataset, dev_dataset = Spliter.no_split(TRAIN_PATH)
+    train_dataset, dev_dataset = Spliter.split_testing(TRAIN_PATH)
 
     # Train, Dev Prompt 생성
     prompt = Prompt()
@@ -104,7 +104,7 @@ def train():
     trainer.train()
     # git에 올린 코드
     model_state_dict = model.state_dict()
-    torch.save({'model_state_dict' : model_state_dict}, './best_model/bestmodel.pth')
+    torch.save({'model_state_dict' : model_state_dict}, './best_model/bestmodel_cv5.pth')
     
 def main():
     train()
