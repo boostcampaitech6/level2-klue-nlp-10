@@ -24,12 +24,12 @@ def train():
     TRAIN_PATH = "../dataset/train/train.csv"
     LABEL_CNT = 30
     P_CONFIG = {'prompt_kind' : 's_and_o',  # ['s_sep_o', 's_and_o', 'quiz']
-                'preprocess_method' : 'typed_entity_marker_punct', # ['baseline_preprocessor', 'entity_mask', 'entity_marker', 'entity_marker_punct', 'typed_entity_marker', 'typed_entity_marker_punct']
+                'preprocess_method' : 'typed_entity_marker', # ['baseline_preprocessor', 'entity_mask', 'entity_marker', 'entity_marker_punct', 'typed_entity_marker', 'typed_entity_marker_punct']
                 'and_marker' : '와',       # ['와', '그리고', '&', '[SEP]']
-                'add_question' : True,     # sentence 뒷 부분에 "sub_e 와 obj_e의 관계는 무엇입니까?""
+                'add_question' : False,     # sentence 뒷 부분에 "sub_e 와 obj_e의 관계는 무엇입니까?""
                 'only_sentence' : False,   # True : (sentence) / False : (prompt + sentence)
                 'loss_name' : 'CrossEntropy',  # loss fuction 선택: 'CrossEntropy', 'FocalLoss'
-                'matching_the_blank' : None} # [None, 'entity_start', 'entity_start_end']
+                'matching_the_blank' : 'entity_start'} # [None, 'entity_start', 'entity_start_end']
     
 
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
@@ -52,8 +52,9 @@ def train():
     dev_label = label_to_num(dev_dataset['label'].values)
 
     # tokenizing dataset
-    tokenized_train = tokenized_dataset(tokenizer, train_prompt, train_sentence, only_sentence=P_CONFIG['only_sentence'])
-    tokenized_dev = tokenized_dataset(tokenizer, dev_prompt, dev_sentence, only_sentence=P_CONFIG['only_sentence'])
+    max_length = 1000 if P_CONFIG['matching_the_blank'] else 256
+    tokenized_train = tokenized_dataset(tokenizer, train_prompt, train_sentence, max_length, only_sentence=P_CONFIG['only_sentence'])
+    tokenized_dev = tokenized_dataset(tokenizer, dev_prompt, dev_sentence, max_length, only_sentence=P_CONFIG['only_sentence'])
     
     # Matching the blank 사용시 tokenizer에 matching_the_blanks_ids 정보 추가
     if P_CONFIG['matching_the_blank']:
@@ -86,12 +87,12 @@ def train():
     training_args = TrainingArguments(
       output_dir='./results',          # output directory
       save_total_limit=1,              # number of total save model.
-      save_steps=500,                 # model saving step.
-      num_train_epochs=3,              # total number of training epochs
+      save_steps=700,                 # model saving step.
+      num_train_epochs=4,              # total number of training epochs
       learning_rate=5e-5,               # learning_rate
       per_device_train_batch_size=32,  # batch size per device during training
       per_device_eval_batch_size=32,   # batch size for evaluation
-      warmup_steps=500,                # number of warmup steps for learning rate scheduler
+      warmup_steps=700,                # number of warmup steps for learning rate scheduler
       weight_decay=0.01,               # strength of weight decay
       logging_dir='./logs',            # directory for storing logs
       logging_steps=100,              # log saving step.
@@ -99,7 +100,7 @@ def train():
                                   # `no`: No evaluation during training.
                                   # `steps`: Evaluate every `eval_steps`.
                                   # `epoch`: Evaluate every end of epoch.
-      eval_steps = 500,            # evaluation step.
+      eval_steps = 700,            # evaluation step.
       load_best_model_at_end = True 
     )
 

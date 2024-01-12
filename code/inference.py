@@ -67,12 +67,12 @@ def main(args):
   TEST_PATH = "../dataset/test/test_data.csv"
   LABEL_CNT = 30
   P_CONFIG = {'prompt_kind' : 's_and_o',  
-                'preprocess_method' : 'typed_entity_marker_punct', 
+                'preprocess_method' : 'typed_entity_marker', 
                 'and_marker' : '와',    
-                'add_question' : True,    
+                'add_question' : False,    
                 'only_sentence' : False,   
                 'loss_name' : 'CrossEntropy', 
-                'matching_the_blank' : None} 
+                'matching_the_blank' : 'entity_start'} 
     
 
   tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
@@ -89,7 +89,8 @@ def main(args):
   test_sentence, tokenizer = getattr(preprocessor, P_CONFIG['preprocess_method'])(test_dataset, tokenizer, add_question=P_CONFIG['add_question'], and_marker=P_CONFIG['and_marker'])
 
   # tokenizing Test dataset
-  tokenized_test = tokenized_dataset(tokenizer, test_prompt, test_sentence, only_sentence=P_CONFIG['only_sentence'])
+  max_length = 1000 if P_CONFIG['matching_the_blank'] else 256
+  tokenized_test = tokenized_dataset(tokenizer, test_prompt, test_sentence, max_length, only_sentence=P_CONFIG['only_sentence'])
   
   if P_CONFIG['matching_the_blank']:
     test_entitiy_marker_loc_ids = get_entity_loc(tokenizer=tokenizer, tokenized_sentences = tokenized_test, config=P_CONFIG)
