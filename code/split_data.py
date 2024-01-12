@@ -9,6 +9,26 @@ class Spliter:
         dataset = pd.read_csv(train_path)
         return dataset, dataset
 
+
+    def validation_stratified_split(train_path:str, dev_ratio:float=0.1, stratify:str='new_label', random_state:int=42, shuffle:bool=True):
+        """make validadtion set(considering label-entity type match)"""
+        dataset = pd.read_csv(train_path)
+        dataset['sub_type'] = dataset['subject_entity'].apply(lambda x :eval(x)['type'])
+        dataset['obj_type'] = dataset['object_entity'].apply(lambda x :eval(x)['type'])
+        dataset['type_match'] = dataset['sub_type'] + '-' + dataset['obj_type']
+
+        dataset['new_label'] = dataset['label']
+        dataset.loc[dataset['label'] == 'no_relation', 'new_label'] = "no_relation_" + dataset.loc[dataset['label'] == 'no_relation', 'type_match']
+
+        train_idx, val_idx = train_test_split(dataset.index,
+                                              test_size = dev_ratio, 
+                                              stratify = dataset[stratify],
+                                              random_state = random_state,
+                                              shuffle = shuffle)
+
+        train_dataset, val_dataset = dataset.iloc[train_idx, :6], dataset.iloc[val_idx, :6]
+        return train_dataset, val_dataset
+
     
     def random_split(train_path:str, dev_ratio:float=0.1, random_state:int=42, shuffle:bool=True):
         """Random train test split"""
