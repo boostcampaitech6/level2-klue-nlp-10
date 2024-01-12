@@ -10,12 +10,12 @@ import argparse
 from tqdm import tqdm
 
 from datasets import RE_Dataset
-from preprocessing import Preprocessor, Prompt, tokenized_dataset
+from preprocessing import Preprocessor, Prompt, tokenized_dataset, get_entity_loc
 from utils import set_seed, num_to_label
-from model import BaseModel
+from model import BaseModel, MtbModel
 
 
-def inference(model, tokenized_sent, device):
+def inference(model, tokenized_sent, device, mtb):
   """
     test dataset을 DataLoader로 만들어 준 후,
     batch_size로 나눠 model이 예측 합니다.
@@ -25,13 +25,25 @@ def inference(model, tokenized_sent, device):
   output_pred = []
   output_prob = []
   for i, data in enumerate(tqdm(dataloader)):
-    with torch.no_grad():
-      outputs = model(
-          input_ids=data['input_ids'].to(device),
-          attention_mask=data['attention_mask'].to(device),
-          token_type_ids=data['token_type_ids'].to(device)
-          )
-    logits = outputs[0]
+    # matching the blank인 경우
+    if mtb:
+      with torch.no_grad():
+        inputs = {'input_ids' : data['input_ids'].to(device),
+                    'attention_mask' :data['attention_mask'].to(device),
+                    'token_type_ids' :data['token_type_ids'].to(device),
+                    'matching_the_blanks_ids' : data['matching_the_blanks_ids']}
+        outputs = model(**inputs)
+      logits = outputs['logits']
+    # 일반 모델 예측일 경우
+    else: 
+      with torch.no_grad():
+        outputs = model(
+            input_ids=data['input_ids'].to(device),
+            attention_mask=data['attention_mask'].to(device),
+            token_type_ids=data['token_type_ids'].to(device)
+            )
+      logits = outputs[0]
+    
     prob = F.softmax(logits, dim=-1).detach().cpu().numpy()
     logits = logits.detach().cpu().numpy()
     result = np.argmax(logits, axis=-1)
@@ -54,12 +66,15 @@ def main(args):
   MODEL_NAME = "klue/roberta-large"
   TEST_PATH = "../dataset/test/test_data.csv"
   LABEL_CNT = 30
-  P_CONFIG = {'prompt_kind' : 's_and_o',
-                'preprocess_method' : 'typed_entity_marker_punct',
-                'and_marker' : '와',
-                'add_question' : True,
-                'only_sentence' : False} 
-  
+  P_CONFIG = {'prompt_kind' : 's_and_o',  
+                'preprocess_method' : 'typed_entity_marker_punct', 
+                'and_marker' : '와',    
+                'add_question' : False,    
+                'only_sentence' : False,   
+                'loss_name' : 'CrossEntropy', 
+                'matching_the_blank' : None} 
+    
+
   tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 
   ## load test datset
@@ -74,21 +89,30 @@ def main(args):
   test_sentence, tokenizer = getattr(preprocessor, P_CONFIG['preprocess_method'])(test_dataset, tokenizer, add_question=P_CONFIG['add_question'], and_marker=P_CONFIG['and_marker'])
 
   # tokenizing Test dataset
-  tokenized_test = tokenized_dataset(tokenizer, test_prompt, test_sentence, only_sentence=P_CONFIG['only_sentence'])
+  max_length = 1000 if P_CONFIG['matching_the_blank'] else 256
+  tokenized_test = tokenized_dataset(tokenizer, test_prompt, test_sentence, max_length, only_sentence=P_CONFIG['only_sentence'])
   
+  if P_CONFIG['matching_the_blank']:
+    test_entitiy_marker_loc_ids = get_entity_loc(tokenizer=tokenizer, tokenized_sentences = tokenized_test, config=P_CONFIG)
+    tokenized_test['matching_the_blanks_ids'] = torch.tensor(test_entitiy_marker_loc_ids, dtype=torch.int64)
+
   # Test label 준비
   test_label = list(map(int, test_dataset['label'].values))
   re_test_dataset = RE_Dataset(tokenized_test , test_label)
 
-  ## load my model - tokenizer 추가
-  model = BaseModel(model_name=MODEL_NAME, label_cnt=LABEL_CNT, tokenizer=tokenizer)
+  # setting model hyperparameter
+  if P_CONFIG['matching_the_blank']:
+      model = MtbModel(model_name=MODEL_NAME, label_cnt=LABEL_CNT, tokenizer=tokenizer, mtb_type=P_CONFIG['matching_the_blank'])
+  else:
+      model = BaseModel(model_name=MODEL_NAME, label_cnt=LABEL_CNT, tokenizer=tokenizer)
+
   checkpoint = torch.load(args.model_path)
   model.load_state_dict(checkpoint['model_state_dict'])
   model.parameters
   model.to(device)
 
   ## predict answer
-  pred_answer, output_prob = inference(model, re_test_dataset, device) # model에서 class 추론
+  pred_answer, output_prob = inference(model, re_test_dataset, device, P_CONFIG['matching_the_blank']) # model에서 class 추론
   pred_answer = num_to_label(pred_answer) # 숫자로 된 class를 원래 문자열 라벨로 변환.
   
   ## make csv file with predicted answer

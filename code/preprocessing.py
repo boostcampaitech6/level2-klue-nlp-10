@@ -89,8 +89,7 @@ class Preprocessor:
             change_sentences.append(sentence)
 
         # token 추가
-        add_tokens = new_token - set(tokenizer.vocab.keys())
-        print(f'Added New Token Cnt : {len(add_tokens)} List : {add_tokens}')
+        print(f'Added New Token Cnt : {len(new_token)} List : {new_token}')
         special_tokens_dict = {'additional_special_tokens': sorted(list(new_token))}
         tokenizer.add_special_tokens(special_tokens_dict)
 
@@ -140,11 +139,6 @@ class Preprocessor:
             sentence = self.make_sentence(sentence, sub_e_info, sub_e_marker, obj_e_info, obj_e_marker, add_question, and_marker)
             change_sentences.append(sentence)
 
-            # 신규 토큰 추가.
-            new_token = new_token | set([f"<S:{sub_e_info['type'].upper()}>", f"</S:{sub_e_info['type'].upper()}>", f"<O:{obj_e_info['type'].upper()}>", f"</O:{obj_e_info['type'].upper()}>"])
-            
-        
-        add_tokens = new_token - set(tokenizer.vocab.keys())
         print(f'Added New Token Cnt : {len(new_token)} List : {new_token}')
         special_tokens_dict = {'additional_special_tokens': sorted(list(new_token))}
         tokenizer.add_special_tokens(special_tokens_dict)
@@ -180,6 +174,31 @@ class Preprocessor:
         tokenizer.add_special_tokens(special_tokens_dict)
         
         return change_sentences, tokenizer
+    
+    def typed_entity_marker_non_object_type(self, dataset:pd.DataFrame, tokenizer, add_question:bool=True, and_marker:str='와'):
+        """
+        Before  : 이순신은 조선의 무신이다.
+        After   : <S:PERSON> 이순신 </S:PERSON>은 조선의 <O> 무신 </O>이다.
+        Qestion : <S:PERSON> 이순신 </S:PERSON>은 조선의 <O> 무신 </O>이다. [SEP] <S:PERSON> 이순신 </S:PERSON> 와 <O> 무신 </O>의 관계는 무엇입니까?
+        """
+        new_token, change_sentences = set(['<O>', '</O>', '<S:PER>', '</S:PER>', '<S:ORG>', '</S:ORG>', '<S:LOC>', '</S:LOC>']), [] 
+
+        for i in tqdm(range(len(dataset)), desc = 'Preprocessor - typed entity marker working ...!!'):
+            sub_e_info, obj_e_info = literal_eval(dataset['subject_entity'][i]), literal_eval(dataset['object_entity'][i])
+            sub_e_marker, obj_e_marker =  f"<S:{sub_e_info['type'].upper()}> {sub_e_info['word']} </S:{sub_e_info['type'].upper()}>", f"<O> {obj_e_info['word']} </O>"
+            sentence = dataset['sentence'][i]
+            
+            # new sentence 생성
+            sentence = self.make_sentence(sentence, sub_e_info, sub_e_marker, obj_e_info, obj_e_marker, add_question, and_marker)
+            change_sentences.append(sentence)
+
+        
+        print(f'Added New Token Cnt : {len(new_token)} List : {new_token}')
+        special_tokens_dict = {'additional_special_tokens': sorted(list(new_token))}
+        tokenizer.add_special_tokens(special_tokens_dict)
+        
+        return change_sentences, tokenizer
+
 
 
 class Prompt:
@@ -211,8 +230,11 @@ class Prompt:
 
         elif marker == 'typed_entity_marker_punct':
             prompt = f"@ * {mapper[sub_type]} * {sub_e} @ {and_marker} # ^ {mapper[obj_type]} ^ {obj_e} #"
+        
+        elif marker == 'typed_entity_marker_non_object_type':
+            prompt = f"<S:{sub_type.upper()}> {sub_e} </S:{sub_type.upper()}> {and_marker} <O> {obj_e} </O>"
         else:
-            raise Exception("Check prompt marker.. not in ['baseline_preprocessor', 'entity_mask', 'entity_marker', 'entity_marker_punct', 'typed_entity_marker', 'typed_entity_marker_punct']")
+            raise Exception("Check prompt marker.. not in ['baseline_preprocessor', 'entity_mask', 'entity_marker', 'entity_marker_punct', 'typed_entity_marker', 'typed_entity_marker_punct','typed_entity_marker_non_object_type']")
 
         return prompt
 
@@ -246,6 +268,7 @@ class Prompt:
 
 
 
+
 def tokenized_dataset(tokenizer, prompt:List , sentence:List, max_length:int=256, only_sentence=False):
     """prompt와 sentence 입력시 tokenizer에 따라 sentence를 tokenizing 하는 메서드."""
 
@@ -271,3 +294,53 @@ def tokenized_dataset(tokenizer, prompt:List , sentence:List, max_length:int=256
                                         add_special_tokens=True,
                                         )
     return tokenized_sentences
+
+
+def get_entity_loc(tokenizer, tokenized_sentences, config):
+    """Matching The Blanks에 사용하는 entity marker 위치 정보를 생성하는 함수"""
+
+    # 현재 Matching the blank를 지원하는 marker인지 확인
+    assert config['preprocess_method'] in ['typed_entity_marker', 'entity_marker', 'typed_entity_marker_non_object_type'], "Matching the blank possible whth ['typed_entity_marker', 'entity_marker', 'typed_entity_marker_non_object_type']"
+
+    entitiy_marker_loc_ids = []
+    marker = { 'typed_entity_marker' : ['<O:POH>', '</O:LOC>', '</O:ORG>', '<S:ORG>', '</S:LOC>', '</O:NOH>', '</O:DAT>', '<S:PER>', '<S:LOC>', '</S:ORG>', '<O:LOC>', '<O:NOH>', '<O:ORG>', '</O:POH>', '<O:PER>', '</O:PER>', '<O:DAT>', '</S:PER>'],
+                'typed_entity_marker_non_object_type' : ['<O>', '</O>', '<S:PER>', '</S:PER>', '<S:ORG>', '</S:ORG>', '<S:LOC>', '</S:LOC>'],
+            'entity_marker' : ['[E1]', '[E2]', '[/E1]', '[/E2]']}
+
+    # start marker와 end marker 분리 - entity 위치 정보에 다른 숫자로 표기할 것임.
+    start_marker_list, end_marker_list, marker_list = [], [], marker[config['preprocess_method']] 
+    for m in marker_list:
+        if '/' in m:
+            end_marker_list.append(tokenizer.convert_tokens_to_ids(m))
+        else:
+            start_marker_list.append(tokenizer.convert_tokens_to_ids(m))
+
+    # token length 추출 
+    TOKEN_LENGTH = len(tokenized_sentences['input_ids'][0])
+
+
+    for tokenized_sentence in tqdm(tokenized_sentences['input_ids'], desc='Add Tokenizer Matching the blanks ids ...'):
+        # entity marker 위치 정보를 담을 list 생성.
+        entity_marker_loc = [0]*TOKEN_LENGTH
+        
+        # Prompt type에 따라서, sentence 내의 marker를 선별하기 위한 IDX 추출.
+        IDX = 0 if config['only_sentence'] else 1
+        
+        tokens = tokenized_sentence.tolist()
+        # [E1], <O:POH>와 같은 entity 앞에 붙는 marker는 2로 표시
+        for m in start_marker_list:
+            if m in tokens:
+                start_idx = [idx for idx, token in enumerate(tokens) if token == m]
+                entity_marker_loc[start_idx[IDX]] = 2
+        
+        # [/E1], </O:POH>와 같은 entity 뒤에 붙는 marker는 3로 표시
+        for m in end_marker_list:
+            if m in tokens:
+                end_idx = [idx for idx, token in enumerate(tokens) if token == m]
+                entity_marker_loc[end_idx[IDX]] = 3
+
+        # [CLS] 토큰 기호 : 1
+        entity_marker_loc[0] = 1
+        entitiy_marker_loc_ids.append(entity_marker_loc)
+    
+    return entitiy_marker_loc_ids
