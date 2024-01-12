@@ -160,7 +160,7 @@ class Preprocessor:
         Qestion : @ * 사람 * 이순신 @은 조선의 # ^ 직업 ^ 무신 # 이다. [SEP] @ * 사람 * 이순신 @ 와 # ^ 직업 ^ 무신 #의 관계는 무엇입니까? 
         """
         # ORG(조직), PER(인물), DAT(날짜), LOC(지명), POH(기타), NOH(기타 수량 표현) 
-        mapper = {'ORG' : '조직', 'PER' : '인물', 'DAT' : '날짜', 'LOC' : '지역', 'POH' : '기타', 'NOH' : 'noh'}
+        mapper = {'ORG' : '조직', 'PER' : '인물', 'DAT' : '날짜', 'LOC' : '지역', 'POH' : '기타', 'NOH' : '수량'}
         
         new_token, change_sentences = set(['@', '#', '*', '^'] + list(mapper.values())), []
 

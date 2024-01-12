@@ -1,7 +1,7 @@
 import pandas as pd
 
-best = pd.read_csv("/data/ephemeral/level2-klue-nlp-10/code/prediction/output_ensemble4.csv")
-e5 = pd.read_csv("/data/ephemeral/level2-klue-nlp-10/code/prediction/output_ensemble5.csv")
+best = pd.read_csv("/data/ephemeral/level2-klue-nlp-10/code/prediction/output_ensemble5.csv")
+e5 = pd.read_csv("/data/ephemeral/level2-klue-nlp-10/code/prediction/output_ensemble5_0112.csv")
 
 a = best['pred_label'].to_list()
 b = e5['pred_label'].to_list()
