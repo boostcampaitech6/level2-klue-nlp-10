@@ -27,6 +27,8 @@ class Spliter:
                                               shuffle = shuffle)
 
         train_dataset, val_dataset = dataset.iloc[train_idx, :6], dataset.iloc[val_idx, :6]
+        train_dataset = train_dataset.reset_index(drop= True)
+        val_dataset = val_dataset.reset_index(drop= True)
         return train_dataset, val_dataset
 
     
