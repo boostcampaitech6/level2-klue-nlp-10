@@ -20,7 +20,7 @@ def inference(model, tokenized_sent, device):
     test dataset을 DataLoader로 만들어 준 후,
     batch_size로 나눠 model이 예측 합니다.
   """
-  dataloader = DataLoader(tokenized_sent, batch_size=16, shuffle=False)
+  dataloader = DataLoader(tokenized_sent, batch_size=32, shuffle=False)
   model.eval()
   output_pred = []
   output_prob = []
@@ -57,7 +57,7 @@ def main(args):
   P_CONFIG = {'prompt_kind' : 's_and_o',
                 'preprocess_method' : 'typed_entity_marker_punct',
                 'and_marker' : '와',
-                'add_question' : True,
+                'add_question' : False,
                 'only_sentence' : False} 
   
   tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
@@ -96,7 +96,7 @@ def main(args):
   # 아래 directory와 columns의 형태는 지켜주시기 바랍니다.
   output = pd.DataFrame({'id' : test_dataset['id'],'pred_label':pred_answer,'probs':output_prob,})
 
-  output.to_csv('./prediction/submission.csv', index=False) # 최종적으로 완성된 예측한 라벨 csv 파일 형태로 저장.
+  output.to_csv('./prediction/augment_3.csv', index=False) # 최종적으로 완성된 예측한 라벨 csv 파일 형태로 저장.
   #### 필수!! ##############################################
   print('---- Finish! ----')
 
@@ -105,8 +105,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     
     # model dir
-    parser.add_argument('--model_path', type=str, default="./best_model/bestmodel.pth")
+    parser.add_argument('--model_path', type=str, default="./best_model/bestmodel_augment3.pth")
     args = parser.parse_args()
     print(args)
     main(args)
-    

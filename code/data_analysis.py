@@ -4,18 +4,19 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import json
+import ast
 
 #%%
 # path 및 df
 
-train_path = '../dataset/train/train.csv'
+train_path = '../dataset/train/augmented_train3.csv'
 train_df = pd.read_csv(train_path)
 
 test_path = '../dataset/test/test_data.csv'
 test_df = pd.read_csv(test_path)
 
-augmented_path = '../dataset/train/augmented_train.csv'
-augmented_df = pd.read_csv(augmented_path)
+#augmented_path = '../dataset/train/augmented_train.csv'
+#augmented_df = pd.read_csv(augmented_path)
 
 # %%
 # subj_entity의 라벨 종류 및 분포 / obj_entity의 라벨 종류 및 분포
@@ -89,8 +90,8 @@ def visualize_obj_label(train_df):
     plt.show()
 
 
-visualize_subj_label(test_df)
-visualize_obj_label(test_df)
+visualize_subj_label(train_df)
+visualize_obj_label(train_df)
 
 # %%
 # relation 시각화
@@ -109,7 +110,7 @@ def visualize_relation(train_df):
     plt.xlabel('Counts')
     plt.show()
 
-visualize_relation(augmented_df)
+visualize_relation(train_df)
 
 # %%
 # sentence 길이 시각화
@@ -191,3 +192,30 @@ def detect_duplicated(train_df):
 detect_duplicated(augmented_df)
 
 # %%
+
+def find_subj_entity(test_df):
+    test_df['subject_entity']
+    test_df['subject_entity_type'] = test_df['subject_entity'].apply(lambda x: ast.literal_eval(x)['type'] if pd.notnull(x) else None)
+    t = test_df['subject_entity_type'].value_counts()
+    print('subj_entity: ', t)
+
+print(find_subj_entity(test_df))
+# %%
+
+#test_df['object_entity'] = test_df['object_entity'].apply(ast.literal_eval)
+
+def find_obj_entity(test_df):
+    test_df['object_entity']
+    test_df['object_entity_type'] = test_df['object_entity'].apply(lambda x: ast.literal_eval(x)['type'] if pd.notnull(x) else None)
+    t = test_df['object_entity_type'].value_counts()
+    print('obj_entity: ', t)
+
+print(find_obj_entity(test_df))
+# %%
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import json
+import ast
+

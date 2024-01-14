@@ -5,6 +5,7 @@ import numpy as np
 from transformers import AutoTokenizer, AutoConfig, AutoModelForSequenceClassification, Trainer, TrainingArguments, EarlyStoppingCallback
 from datasets import RE_Dataset
 import numpy as np
+import os
 
 from preprocessing import Preprocessor, Prompt, tokenized_dataset
 from metrics import compute_metrics
@@ -26,9 +27,10 @@ def train():
     P_CONFIG = {'prompt_kind' : 's_and_o',  # ['s_sep_o', 's_and_o', 'quiz']
                 'preprocess_method' : 'typed_entity_marker_punct', # ['baseline_preprocessor', 'entity_mask', 'entity_marker', 'entity_marker_punct', 'typed_entity_marker', 'typed_entity_marker_punct']
                 'and_marker' : '와',       # ['와', '그리고', '&', '[SEP]']
-                'add_question' : True,     # sentence 뒷 부분에 "sub_e 와 obj_e의 관계는 무엇입니까?""
+                'add_question' : False,     # sentence 뒷 부분에 "sub_e 와 obj_e의 관계는 무엇입니까?""
                 'only_sentence' : False,   # True : (sentence) / False : (prompt + sentence)
-                'loss_name' : 'FocalLoss'  # loss fuction 선택: 'CrossEntropy', 'FocalLoss'
+                'loss_name' : 'CrossEntropy',  # loss fuction 선택: 'CrossEntropy', 'FocalLoss'
+                'run_name' : 'sota_analysis'
                 }
     
 
@@ -70,6 +72,8 @@ def train():
     model.parameters
     model.to(device)
 
+    os.environ['WANDB_PROJECT'] = 'klue'
+
     # 사용한 option 외에도 다양한 option들이 있습니다.
     # https://huggingface.co/transformers/main_classes/trainer.html#trainingarguments 참고해주세요.
     training_args = TrainingArguments(
@@ -89,7 +93,9 @@ def train():
                                   # `steps`: Evaluate every `eval_steps`.
                                   # `epoch`: Evaluate every end of epoch.
       eval_steps = 500,            # evaluation step.
-      load_best_model_at_end = True 
+      load_best_model_at_end = True,
+      report_to = 'wandb',
+      run_name = P_CONFIG['run_name'] 
     )
 
     trainer = CustomTrainer(
@@ -108,7 +114,7 @@ def train():
     trainer.train()
     # git에 올린 코드
     model_state_dict = model.state_dict()
-    torch.save({'model_state_dict' : model_state_dict}, './best_model/bestmodel.pth')
+    torch.save({'model_state_dict' : model_state_dict}, './best_model/bestmodel_basic.pth')
     
 def main():
     train()
