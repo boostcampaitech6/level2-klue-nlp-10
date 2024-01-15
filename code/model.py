@@ -108,41 +108,34 @@ class RecentModel(nn.Module):
             [0]] # LOC, DAT
 
         self.classifier = torch.nn.Sequential(
-            self.model.pooler, # hidden_size -> hidden_size # transformer는 시퀀스의 각 위치에 대한 정보를 포함하고 있으므로, 정보를 요약할 필요가 있다.
+            self.model.pooler, 
             torch.nn.Dropout(p=0.1),
             torch.nn.Linear(in_features=self.model_config.hidden_size, out_features=self.model_config.num_labels , bias=True)
         )
 
         self.special_classifier = torch.nn.ModuleList([deepcopy(self.classifier) for _ in range(2)])
-        # 각 classifier layer를 통과한 hidden state를 가중합하고 그 가중치를 학습시킨다.
         self.weight_parameter = torch.nn.Parameter(torch.tensor([[[0.5]], [[0.5]]]))
         
         
     def forward(self, input_ids, attention_mask=None, token_type_ids=None, labels=None, restrict_num=None, output_attentions=False):
         outputs = self.model(input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids, output_attentions=output_attentions)
-        special_outputs = outputs.last_hidden_state # batch, seqlen, hidden_size
+        special_outputs = outputs.last_hidden_state
                         
         batch_size = len(input_ids)
         
         special_idx = list()
         
-        # entity type을 forward에서  안 받고, 그냥 문장 내에서 special token을 찾는 방법도 써보았으나, 학습시간이 거의 2배로 증가한다.
         for i in range(batch_size):
             
-            sub_start_idx = torch.nonzero(input_ids[i] == self.sub_ids)[0][0] # entity type에 맞는 special token의 index
-            # sub_end_idx = torch.nonzero(input_ids[i] == self.sub_ids)[1][0]
+            sub_start_idx = torch.nonzero(input_ids[i] == self.sub_ids)[0][0]
             obj_start_idx = torch.nonzero(input_ids[i] == self.obj_ids)[0][0]
-            # obj_end_idx = torch.nonzero(input_ids[i] == self.obj_ids)[1][0]
             
             special_idx.append([sub_start_idx, obj_start_idx])
-            # special_idx.append([sub_start_idx, sub_end_idx, obj_start_idx, obj_end_idx])
         
-        # (batch_size, hidden_size) 가 2개인 list
         pooled_output = [torch.stack([special_outputs[i, special_idx[i][j], :] for i in range(batch_size)]) for j in range(2)]
         
-        # (batch_size, hidden_size) 가 2개인 list
-        logits = torch.stack([self.special_classifier[i](pooled_output[i].unsqueeze(1)) for i in range(2)], dim=0) # (2, batch, num_label)
-        logits = torch.sum(self.weight_parameter*logits, dim=0) # (batch_size, num_label)
+        logits = torch.stack([self.special_classifier[i](pooled_output[i].unsqueeze(1)) for i in range(2)], dim=0)
+        logits = torch.sum(self.weight_parameter*logits, dim=0) 
         
         loss = None
         
@@ -156,10 +149,9 @@ class RecentModel(nn.Module):
             loss = loss_sum / batch_size
             loss = loss.squeeze()
         
-        # attention 은 num_layer * (batch_size, num_attention_head, sequence_length, sequence_length)    
         if output_attentions:    
             outputs = {"loss" : loss, "logits": logits, "attentions": outputs.attentions[0]}
         else:
             outputs = {"loss" : loss, "logits": logits}
         
-        return outputs # (loss), logits, (attentions)
+        return outputs 
