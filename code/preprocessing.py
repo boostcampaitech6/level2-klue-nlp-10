@@ -266,6 +266,22 @@ class Prompt:
         return change_prompts
     
 
+entities_num = {'PER:POH': 0, 'PER:LOC': 1, 'PER:PER': 2, 'PER:ORG': 3, 'PER:DAT': 4, 'PER:NOH': 5,
+               'ORG:POH': 6, 'ORG:LOC': 7, 'ORG:PER': 8, 'ORG:ORG': 9, 'ORG:DAT': 10, 'ORG:NOH': 11,
+               'LOC:DAT': 12}
+    
+class Recent:
+
+    def find_restrict_num(self, dataset):
+        
+        restrict_num = []
+
+        for i in tqdm(range(len(dataset)), desc = f'finding restrict_num.....'):
+            sub_type, obj_type = literal_eval(dataset['subject_entity'][i])['type'], literal_eval(dataset['object_entity'][i])['type']
+            restrict_num.append(entities_num[sub_type + ':' + obj_type])
+        
+        return restrict_num
+
 
 
 

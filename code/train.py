@@ -3,14 +3,15 @@ import pandas as pd
 import torch
 import numpy as np
 from transformers import AutoTokenizer, AutoConfig, AutoModelForSequenceClassification, Trainer, TrainingArguments, EarlyStoppingCallback
-from datasets import RE_Dataset
+from datasets import RE_Dataset, Recent_Dataset
 import numpy as np
+import os
 
-from preprocessing import Preprocessor, Prompt, tokenized_dataset, get_entity_loc
+from preprocessing import Preprocessor, Prompt, tokenized_dataset, get_entity_loc, Recent
 from metrics import compute_metrics
 from utils import set_seed, label_to_num
 from split_data import Spliter
-from model import BaseModel, MtbModel
+from model import BaseModel, MtbModel, RecentModel
 from custom_trainer import CustomTrainer
 
 
@@ -29,6 +30,8 @@ def train():
                 'add_question' : False,     # sentence 뒷 부분에 "sub_e 와 obj_e의 관계는 무엇입니까?""
                 'only_sentence' : False,   # True : (sentence) / False : (prompt + sentence)
                 'loss_name' : 'CrossEntropy',  # loss fuction 선택: 'CrossEntropy', 'FocalLoss'
+                'run_name' : 'restrict',
+                'recent' : True,
                 'matching_the_blank' : None} # [None, 'entity_start', 'entity_start_end']
     
 
@@ -37,12 +40,21 @@ def train():
     # No split으로 수정
     train_dataset, dev_dataset = Spliter.no_split(TRAIN_PATH)
 
+    # RECENT
+    # restrict_num 얻기
+    if P_CONFIG['recent']:
+        recent = Recent()
+        restrict_num = recent.find_restrict_num(train_dataset)
+
+
     # Train, Dev Prompt 생성
+    # bert는 [SEP]을 기준으로 앞 뒤 문장줘서 입력 데이터 만들 수 있다. prompt는 앞쪽에 해당하는 것으로서 's와 o의 관계' 또는 's와 o의 관계를 추출하시오'처럼 지시 task로 줄 수 있다.
     prompt = Prompt()
     train_prompt = prompt.make_prompt(train_dataset, kind=P_CONFIG['prompt_kind'], marker=P_CONFIG['preprocess_method'], and_marker=P_CONFIG['and_marker'])
     dev_prompt = prompt.make_prompt(dev_dataset, kind=P_CONFIG['prompt_kind'], marker=P_CONFIG['preprocess_method'], and_marker=P_CONFIG['and_marker'])
 
     # Train, Dev 전처리
+    # [SEP] 뒤쪽에 sentence가 있는데, 이 sentence에 marker를 더해주는 부분
     preprocessor = Preprocessor()
     train_sentence, tokenizer = getattr(preprocessor, P_CONFIG['preprocess_method'])(train_dataset, tokenizer, add_question=P_CONFIG['add_question'], and_marker=P_CONFIG['and_marker'])
     dev_sentence, tokenizer = getattr(preprocessor, P_CONFIG['preprocess_method'])(dev_dataset, tokenizer, add_question=P_CONFIG['add_question'], and_marker=P_CONFIG['and_marker'])
@@ -65,8 +77,13 @@ def train():
 
 
     # make dataset for pytorch.
-    re_train_dataset = RE_Dataset(tokenized_train, train_label)
-    re_dev_dataset = RE_Dataset(tokenized_dev, dev_label)
+    if P_CONFIG['recent']:
+        re_train_dataset = Recent_Dataset(tokenized_train, train_label, restrict_num)  
+        re_dev_dataset = Recent_Dataset(tokenized_dev, dev_label, restrict_num)  
+
+    else:
+        re_train_dataset = RE_Dataset(tokenized_train, train_label)
+        re_dev_dataset = RE_Dataset(tokenized_dev, dev_label)
 
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     print('DEVICE : ', device)
@@ -75,12 +92,19 @@ def train():
     # setting model hyperparameter
     if P_CONFIG['matching_the_blank']:
         model = MtbModel(model_name=MODEL_NAME, label_cnt=LABEL_CNT, tokenizer=tokenizer, mtb_type=P_CONFIG['matching_the_blank'])
+    
+    elif P_CONFIG['recent']:
+        model = RecentModel(model_name=MODEL_NAME, label_cnt=LABEL_CNT, tokenizer=tokenizer, restrict_num=restrict_num)
+
     else:
         model = BaseModel(model_name=MODEL_NAME, label_cnt=LABEL_CNT, tokenizer=tokenizer)
+
     print('MODEL CONFIG')
     print(model.model.config)
     model.parameters
     model.to(device)
+
+    os.environ['WANDB_PROJECT'] = 'klue'
 
     # 사용한 option 외에도 다양한 option들이 있습니다.
     # https://huggingface.co/transformers/main_classes/trainer.html#trainingarguments 참고해주세요.
@@ -101,7 +125,9 @@ def train():
                                   # `steps`: Evaluate every `eval_steps`.
                                   # `epoch`: Evaluate every end of epoch.
       eval_steps = 500,            # evaluation step.
-      load_best_model_at_end = True 
+      load_best_model_at_end = True,
+      report_to = 'wandb',
+      run_name = P_CONFIG['run_name'] 
     )
 
     trainer = CustomTrainer(
@@ -120,7 +146,7 @@ def train():
     trainer.train()
     # git에 올린 코드
     model_state_dict = model.state_dict()
-    torch.save({'model_state_dict' : model_state_dict}, './best_model/bestmodel.pth')
+    torch.save({'model_state_dict' : model_state_dict}, './best_model/bestmodel_restrict.pth')
     
 def main():
     train()
