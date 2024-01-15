@@ -67,7 +67,7 @@ def main(args):
   TEST_PATH = "../dataset/test/test_data.csv"
   LABEL_CNT = 30
   P_CONFIG = {'prompt_kind' : 's_and_o',  
-                'preprocess_method' : 'typed_entity_marker_punct', 
+                'preprocess_method' : 'typed_entity_marker_punctV2', 
                 'and_marker' : '와',    
                 'add_question' : False,    
                 'only_sentence' : False,   

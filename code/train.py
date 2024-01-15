@@ -24,7 +24,7 @@ def train():
     TRAIN_PATH = "../dataset/train/train.csv"
     LABEL_CNT = 30
     P_CONFIG = {'prompt_kind' : 's_and_o',  # ['s_sep_o', 's_and_o', 'quiz']
-                'preprocess_method' : 'typed_entity_marker_punct', # ['baseline_preprocessor', 'entity_mask', 'entity_marker', 'entity_marker_punct', 'typed_entity_marker', 'typed_entity_marker_punct']
+                'preprocess_method' : 'typed_entity_marker_punctV2', # ['baseline_preprocessor', 'entity_mask', 'entity_marker', 'entity_marker_punct', 'typed_entity_marker', 'typed_entity_marker_punct']
                 'and_marker' : '와',       # ['와', '그리고', '&', '[SEP]']
                 'add_question' : False,     # sentence 뒷 부분에 "sub_e 와 obj_e의 관계는 무엇입니까?""
                 'only_sentence' : False,   # True : (sentence) / False : (prompt + sentence)
