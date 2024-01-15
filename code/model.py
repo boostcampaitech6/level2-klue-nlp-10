@@ -54,7 +54,7 @@ class MtbModel(nn.Module):
             output_mtb = torch.cat((outputs_1, outputs_2.view(-1, self.model_config.hidden_size * 2)), dim=-1)
 
 
-        elif self.mtb_type == 'entiy_start_end':
+        elif self.mtb_type == 'entity_start_end':
             # CLS, [E1], [/E1], [E2], [/E2]
             idx_1 = (mtb_loc_ids == 1).nonzero(as_tuple=True)
             idx_2 = (mtb_loc_ids == 2).nonzero(as_tuple=True)
