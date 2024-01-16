@@ -156,7 +156,7 @@ class Preprocessor:
         # ORG(조직), PER(인물), DAT(날짜), LOC(지명), POH(기타), NOH(기타 수량 표현) 
         mapper = {'ORG' : '조직', 'PER' : '인물', 'DAT' : '날짜', 'LOC' : '지역', 'POH' : '기타', 'NOH' : 'noh'}
         
-        new_token, change_sentences = set(['@', '#', '*', '^'] + list(mapper.values())), []
+        new_token, change_sentences = set(['@', '$', '*', '^'] + list(mapper.values())), [] 
 
         for i in tqdm(range(len(dataset)), desc = 'Preprocessor - typed entity marker punct working ...!!'):
             sub_e_info, obj_e_info = literal_eval(dataset['subject_entity'][i]), literal_eval(dataset['object_entity'][i])
@@ -175,6 +175,63 @@ class Preprocessor:
         
         return change_sentences, tokenizer
     
+    def typed_entity_marker_punctV2(self, dataset:pd.DataFrame, tokenizer, add_question:bool=True, and_marker:str='와'):
+        """
+        Before  : 이순신은 조선의 무신이다.
+        After   : @ * 사람 * 이순신 @은 조선의 # ^ 직업 ^ 무신 # 이다.
+        Qestion : @ * 사람 * 이순신 @은 조선의 $ ^ 직업 ^ 무신 $ 이다. [SEP] @ * 사람 * 이순신 @ 와 $ ^ 직업 ^ 무신 $의 관계는 무엇입니까? 
+        """
+        # ORG(조직), PER(인물), DAT(날짜), LOC(지명), POH(기타), NOH(기타 수량 표현) 
+        mapper = {'ORG' : '조직', 'PER' : '인물', 'DAT' : '날짜', 'LOC' : '지역', 'POH' : '기타', 'NOH' : '수량'}
+        
+        new_token, change_sentences = set(['@', '$', '*', '^']), []
+
+        for i in tqdm(range(len(dataset)), desc = 'Preprocessor - typed entity marker punct working ...!!'):
+            sub_e_info, obj_e_info = literal_eval(dataset['subject_entity'][i]), literal_eval(dataset['object_entity'][i])
+            sub_e_marker, obj_e_marker =  f"@ * {mapper[sub_e_info['type']]} * {sub_e_info['word']} @", f"$ ^ {mapper[obj_e_info['type']]} ^ {obj_e_info['word']} $"
+            sentence = dataset['sentence'][i]
+
+            # new sentence 생성
+            sentence = self.make_sentence(sentence, sub_e_info, sub_e_marker, obj_e_info, obj_e_marker, add_question, and_marker)
+            change_sentences.append(sentence)
+
+        # token 추가
+        add_tokens = new_token - set(tokenizer.vocab.keys())
+        print(f'Added New Token Cnt : {len(add_tokens)} List : {add_tokens}')
+        special_tokens_dict = {'additional_special_tokens': sorted(list(new_token))}
+        tokenizer.add_special_tokens(special_tokens_dict)
+        
+        return change_sentences, tokenizer
+    
+
+    def typed_entity_marker_punctV3(self, dataset:pd.DataFrame, tokenizer, add_question:bool=True, and_marker:str='와'):
+        """
+        Before  : 이순신은 조선의 무신이다.
+        After   : [E1] * 사람 * 이순신 [/E1]은 조선의 [E2] ^ 직업 ^ 무신 [/E2] 이다.
+        Qestion : [E1] * 사람 * 이순신 [E1]은 조선의 [E2] ^ 직업 ^ 무신 [/E2] 이다. [SEP] [E1] * 사람 * 이순신 [/E1] 와 [E2] ^ 직업 ^ 무신 [/E2]의 관계는 무엇입니까? 
+        """
+        # ORG(조직), PER(인물), DAT(날짜), LOC(지명), POH(기타), NOH(기타 수량 표현) 
+        mapper = {'ORG' : '조직', 'PER' : '인물', 'DAT' : '날짜', 'LOC' : '지역', 'POH' : '기타', 'NOH' : '수량'}
+        
+        new_token, change_sentences = set(['*', '^', '[E1]', '[/E1]', '[E2]', '[/E2]']), [] # list(mapper.values()))
+
+        for i in tqdm(range(len(dataset)), desc = 'Preprocessor - typed entity marker punct working ...!!'):
+            sub_e_info, obj_e_info = literal_eval(dataset['subject_entity'][i]), literal_eval(dataset['object_entity'][i])
+            sub_e_marker, obj_e_marker =  f"[E1] * {mapper[sub_e_info['type']]} * {sub_e_info['word']} [/E1]", f"[E2] ^ {mapper[obj_e_info['type']]} ^ {obj_e_info['word']} [/E2]"
+            sentence = dataset['sentence'][i]
+
+            # new sentence 생성
+            sentence = self.make_sentence(sentence, sub_e_info, sub_e_marker, obj_e_info, obj_e_marker, add_question, and_marker)
+            change_sentences.append(sentence)
+
+        # token 추가
+        add_tokens = new_token - set(tokenizer.vocab.keys())
+        print(f'Added New Token Cnt : {len(add_tokens)} List : {add_tokens}')
+        special_tokens_dict = {'additional_special_tokens': sorted(list(new_token))}
+        tokenizer.add_special_tokens(special_tokens_dict)
+        
+        return change_sentences, tokenizer
+
     def typed_entity_marker_non_object_type(self, dataset:pd.DataFrame, tokenizer, add_question:bool=True, and_marker:str='와'):
         """
         Before  : 이순신은 조선의 무신이다.
@@ -211,7 +268,7 @@ class Prompt:
         sub_type : ORG
         obj_type : PERSON
         """
-        mapper = {'ORG' : '조직', 'PER' : '인물', 'DAT' : '날짜', 'LOC' : '지역', 'POH' : '기타', 'NOH' : 'noh'}
+        mapper = {'ORG' : '조직', 'PER' : '인물', 'DAT' : '날짜', 'LOC' : '지역', 'POH' : '기타', 'NOH' : '수량'}
         prompt = ""
         if marker == 'baseline_preprocessor':
             prompt = f"{sub_e} {and_marker} {obj_e}"
@@ -231,10 +288,16 @@ class Prompt:
         elif marker == 'typed_entity_marker_punct':
             prompt = f"@ * {mapper[sub_type]} * {sub_e} @ {and_marker} # ^ {mapper[obj_type]} ^ {obj_e} #"
         
+        elif marker == 'typed_entity_marker_punctV2':
+            prompt = f"@ * {mapper[sub_type]} * {sub_e} @ {and_marker} $ ^ {mapper[obj_type]} ^ {obj_e} $"
+        
+        elif marker == 'typed_entity_marker_punctV3':
+            prompt = f"[E1] * {mapper[sub_type]} * {sub_e} [/E1] {and_marker} [E2] ^ {mapper[obj_type]} ^ {obj_e} [/E2]"
+
         elif marker == 'typed_entity_marker_non_object_type':
             prompt = f"<S:{sub_type.upper()}> {sub_e} </S:{sub_type.upper()}> {and_marker} <O> {obj_e} </O>"
         else:
-            raise Exception("Check prompt marker.. not in ['baseline_preprocessor', 'entity_mask', 'entity_marker', 'entity_marker_punct', 'typed_entity_marker', 'typed_entity_marker_punct','typed_entity_marker_non_object_type']")
+            raise Exception("Check prompt marker.. not in ['baseline_preprocessor', 'entity_mask', 'entity_marker', 'entity_marker_punct', 'typed_entity_marker', 'typed_entity_marker_punct', 'typed_entity_marker_punctV2', 'typed_entity_marker_punctV3', 'typed_entity_marker_non_object_type']")
 
         return prompt
 
@@ -300,12 +363,13 @@ def get_entity_loc(tokenizer, tokenized_sentences, config):
     """Matching The Blanks에 사용하는 entity marker 위치 정보를 생성하는 함수"""
 
     # 현재 Matching the blank를 지원하는 marker인지 확인
-    assert config['preprocess_method'] in ['typed_entity_marker', 'entity_marker', 'typed_entity_marker_non_object_type'], "Matching the blank possible whth ['typed_entity_marker', 'entity_marker', 'typed_entity_marker_non_object_type']"
+    assert config['preprocess_method'] in ['typed_entity_marker', 'entity_marker', 'typed_entity_marker_non_object_type', 'typed_entity_marker_punctV3'], "Matching the blank possible whth ['typed_entity_marker', 'entity_marker', 'typed_entity_marker_non_object_type', 'typed_entity_marker_punctV3']"
 
     entitiy_marker_loc_ids = []
     marker = { 'typed_entity_marker' : ['<O:POH>', '</O:LOC>', '</O:ORG>', '<S:ORG>', '</S:LOC>', '</O:NOH>', '</O:DAT>', '<S:PER>', '<S:LOC>', '</S:ORG>', '<O:LOC>', '<O:NOH>', '<O:ORG>', '</O:POH>', '<O:PER>', '</O:PER>', '<O:DAT>', '</S:PER>'],
                 'typed_entity_marker_non_object_type' : ['<O>', '</O>', '<S:PER>', '</S:PER>', '<S:ORG>', '</S:ORG>', '<S:LOC>', '</S:LOC>'],
-            'entity_marker' : ['[E1]', '[E2]', '[/E1]', '[/E2]']}
+                'typed_entity_marker_punctV3' : ['[E1]', '[E2]', '[/E1]', '[/E2]'],
+                'entity_marker' : ['[E1]', '[E2]', '[/E1]', '[/E2]']}
 
     # start marker와 end marker 분리 - entity 위치 정보에 다른 숫자로 표기할 것임.
     start_marker_list, end_marker_list, marker_list = [], [], marker[config['preprocess_method']] 
