@@ -5,6 +5,7 @@ import numpy as np
 from transformers import AutoTokenizer, AutoConfig, AutoModelForSequenceClassification, Trainer, TrainingArguments, EarlyStoppingCallback
 from datasets import RE_Dataset
 import numpy as np
+import os
 
 from preprocessing import Preprocessor, Prompt, tokenized_dataset, get_entity_loc
 from metrics import compute_metrics
@@ -29,8 +30,8 @@ def train():
                 'add_question' : False,     # sentence 뒷 부분에 "sub_e 와 obj_e의 관계는 무엇입니까?""
                 'only_sentence' : False,   # True : (sentence) / False : (prompt + sentence)
                 'loss_name' : 'CrossEntropy',  # loss fuction 선택: 'CrossEntropy', 'FocalLoss'
-                'matching_the_blank' : None} # [None, 'entity_start', 'entity_start_end']
-    
+                'matching_the_blank' : None, # [None, 'entity_start', 'entity_start_end']
+                'run_name' : 'wandb-run-name'}
 
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 
@@ -82,6 +83,9 @@ def train():
     model.parameters
     model.to(device)
 
+    # Wandb setting
+    os.environ['WANDB_PROJECT'] = 're_competition'
+
     # 사용한 option 외에도 다양한 option들이 있습니다.
     # https://huggingface.co/transformers/main_classes/trainer.html#trainingarguments 참고해주세요.
     training_args = TrainingArguments(
@@ -94,7 +98,9 @@ def train():
       per_device_eval_batch_size=32,   # batch size for evaluation
       warmup_steps=500,                # number of warmup steps for learning rate scheduler
       weight_decay=0.01,               # strength of weight decay
-      logging_dir='./logs',            # directory for storing logs
+      # logging_dir='./logs',            # directory for storing logs
+      report_to='wandb',
+      run_name=P_CONFIG['run_name'],
       logging_steps=100,              # log saving step.
       evaluation_strategy='steps', # evaluation strategy to adopt during training
                                   # `no`: No evaluation during training.
@@ -112,7 +118,7 @@ def train():
     train_dataset=re_train_dataset,         # training dataset
     eval_dataset=re_dev_dataset,             # evaluation dataset
     compute_metrics=compute_metrics,         # define metrics function
-    # callbacks = [EarlyStoppingCallback(early_stopping_patience=3)]  # early_stopping 
+    callbacks = [EarlyStoppingCallback(early_stopping_patience=3)]  # early_stopping 
     # early stopping사용을 원하지 않는다면 그냥 callbacks 줄을 주석 처리 하면됨
     )
   
