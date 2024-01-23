@@ -154,6 +154,9 @@ public 전환 후 그려질 예정
 ### 데이터 증강
 Back translation 방식을 활용했다. Google API로 한글을 영어로 번역한 뒤, 다시 한글로 번역하여 새로운 문장을 생성했다. 
 
+
+
+
 ## 데이터 전처리와 성능 확인
 ### Marker 사용
 데이터의 라벨이 entity type과 밀접한 연관이 있다는 인사이트에 근거하여 sentence에 entity type 정보를 넣어줄수 있는 방법을 모색하고자 Marker를 사용
@@ -181,6 +184,22 @@ Back translation 방식을 활용했다. Google API로 한글을 영어로 번�
 ## 아키텍쳐 보완
 
 ### Matching the Blank (MTB) 구현
+Matching the blanks는 CLS 토큰 대신, Entity에 해당하는 token을 사용하여 RE task를 수행하여 성능 개선을 도모했다는 연구입니다. 
+"ENTITY MARKERS – ENTITY START"를 구현했고, 뒤에 존재하는 ENTITY MARKER 토큰까지 사용하는 "ENTITY MARKERS – ENTITY START END"를 구현했다. 또한, CLS는 중요한 정보를 담고 있다고 생각했기에 CLS 토큰을 포함하도록 구현했습니다.
+- ENTITY MARKERS - [CLS] (Baseline) : [CLS] 토큰 사용.
+- ENTITY MARKERS - ENTITY START + [CLS] : [CLS], [E1] 토큰 사용.
+- ENTITY MARKERS - ENTITY START END + [CLS] : [CLS], [E1], [/E1] 토큰 사용.
+
+<div align='center'>
+<img src='img/mtb.png'></img>
+    
+|marker|matching the blank type |micro-f1|
+|--|--|--|
+|typed entity marker|no|72.78|
+|typed entity marker|entity start|73.38|
+|typed entity marker|entity start end|73.70|
+</div>\
+
 
 ### RECETNT
 
