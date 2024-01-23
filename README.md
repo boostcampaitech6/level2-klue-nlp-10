@@ -29,7 +29,7 @@
 
 |권예진 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/Becky-Kwon)|문지원 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/Becky-Kwon)|방제형 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/C7C4FF)|이경재 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/doodaad)|이종원 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/alwaysday4u)|
 |:-:|:-:|:-:|:-:|:-:|
-|<img src='img/yejin.jpg' height=125 width=125></img>|<img src='img/becky_full.jpg' height=125 width=125></img>|<img src='img/kjg.png' height=125 width=125></img>|<img src='img/pjw.jpg' height=125 width=125></img>|<img src='img/syl.png' height=125 width=125></img>|
+|<img src='img/yejin.jpg' height=125 width=125></img>|<img src='img/becky_full.jpg' height=125 width=125></img>|<img src='img/kjg.png' height=125 width=125></img>|<img src='img/KakaoTalk_20240103_170830055짜른거.jpg' height=125 width=125></img>|<img src='img/syl.png' height=125 width=125></img>|
 
 </div>
 
