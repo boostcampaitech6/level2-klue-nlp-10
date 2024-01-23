@@ -192,13 +192,14 @@ Matching the blanks는 CLS 토큰 대신, Entity에 해당하는 token을 사용
 
 <div align='center'>
 <img src='img/mtb.png'></img>
-</div>
-
+    
 |marker|matching the blank type |micro-f1|
 |--|--|--|
 |typed entity marker|no|72.78|
 |typed entity marker|entity start|73.38|
 |typed entity marker|entity start end|73.70|
+</div>\
+
 
 ### RECETNT
 
