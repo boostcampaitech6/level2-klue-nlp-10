@@ -133,6 +133,8 @@ public 전환 후 그려질 예정
 
 </div>
 
+<br>
+
 ## 데이터 
 ### Label 별 데이터셋 특징
 
@@ -203,35 +205,65 @@ Matching the blanks는 CLS 토큰 대신, Entity에 해당하는 token을 사용
 
 
 ### Relation Classification with Entity Type Restriction (RECETNT) 구현
-subject entity type과 object entity type의 조합이 추출해낼 수 있는 relation 유형이 제한되어 있으므로, Relation classification을 위해 entity type의 조합을 classifier에서 한정하는 방법론이다. 
+subject entity type과 object entity type의 조합이 추출해낼 수 있는 relation 유형이 제한되어 있으므로, Relation classification을 위해 entity type의 조합을 classifier에서 한정하는 방법론이다.
+
 <div align='center'>
 <img src='img/RECENT.png'></img>
+
+|RECENT|Marker Type|Micro-f1|
+|--|--|--|
+|No|Typed_entity_marker_punct|73.4566|
+|RECENT|Typed_entity_marker_punct|73.0855|
 </div>
 
 
 ### K-fold 구현
-과적합을 방지하기 위해 K-fold 교차 검증을 시행했습니다. Ttrain 데이터는 5개의 폴드로 나누었고, 기존의 dev 데이터는 최종 학습 평가에 사용했습니다. 하지만 결과는 기대에 미치지 못했습니다. 일부 폴드에서는 적은 에포크 후에 학습이 조기 종료되었고, 매우 낮은 성능을 보였습니다. 이는 앞서 언급한 대로, train 데이터의 불균형 때문으로 추정됩니다.
+과적합을 방지하기 위해 K-fold 교차 검증을 시행했습니다. train 데이터의 label 불균형을 고려해 5개의 폴드로 나누어서 진행했습니다. 하지만 결과는 모든 train 데이터 전체를 학습한 것보다 높지 않았습니다. 
 
 ### Early Stopping 구현
-학습시간을 줄이고 모델의 과적합을 방지하기 위하여 모델의 성능 개선이 미미할 때 조기에 학습을 종료시키는 early stopping을 적용하였습니다. patience값은 주로 3~5로 설정했습니다.
+학습시간을 줄이고 모델의 과적합을 방지하기 위하여 모델의 성능 개선이 미미할 때 조기에 학습을 종료시키는 early stopping을 적용하였습니다. patience값은 주로 3으로 설정했습니다.
 
-### Learning Rate Scheduler 사용 및 Padding 추가 구현
-일정한 LR 사용 시 학습 초기에는 모델의 수렴 속도가 늦춰지고 학습 후기에는 최적해 근처에서 진동하는 문제가 있습니다. 이를 보완하기 위해서 LR Scheduler를 이용하여 학습 초기에는 큰 값의 LR을 부여하여 수렴을 빠르게 하고, 이를 점차 감소시키며 좀 더 정밀하게 최적해를 찾게 했습니다. 이를 구현하기 위해 transformer 라이브러리의 ‘get_linear_schedule_with_ warmup’을 사용했습니다.  
-또한 collate_fn을 통해 배치 단위로 padding을 추가했습니다. 일부 사전 학습된 모델의 경우 입력 길이에 차이가 있으면 에러가 발생했습니다. 이를 해결하고자 transformers의 ‘DataCollatorWithPadding’을 사용하였고 덕분에 보다 보편적인 실험 환경을 갖출 수 있었습니다.
+### Focal Loss Function 사용
+Focal Loss Function을 사용하면 라벨 불균형 문제를 완화할 수 있을 것이라고 생각하고 기존의 손실함수인 Cross Entropy Loss Function을 사용했을 때와 비교하여 실험을 진행했습니다. 
+하지만 유의미한 성능 향상은 보이지 않아 최종 모델에서는 사용하지 않았습니다. 
+<div align='center'>
+    
+|Loss function|Micro_f1|auprc|
+|--|--|--|
+|Cross Entropy|73.4566|77.4988|
+|Focal Loss|72.0505|78.1135|
+</div>
 
-## Model 선택 및 앙상블
+### Dropout rate 변경
+모델이 학습하는 과정에서 train의 score는 높아지는데 validation의 score가 낮아지는 양상을 보여 과적합이라고 생각했습니다. 
+기존의 0.1로 설정된 attention_drop_rate와 hidden_drop_rate를 변경해서 실험해보았습니다. 이때 dropout_rate를 높이면 계산되는 정보가 줄어들기 때문에 epoch도 변경해가며 진행하였습니다.
+하지만 결과적으로 큰 성능의 향상은 없었습니다.
+
+<div align='center'>
+    
+|model|epoch|Micro_f1|auprc loss|비고|
+|--|--|--|--|--|
+|roberta-large|3|72.5172|75.1629|0.15655|default|
+|roberta-large|3|71.4286|77.9807|0.1495|attention_probs_dropout_prob=0.2|
+|roberta-large|4|71.9271|74.6084|0.09437|attention_probs_dropout_prob=0.2|
+|roberta-large|4|72.2187|76.7080|0.09245|attention_probs_dropout_prob=0.3|
+|roberta-large|4|71.8731|76.3384|0.10485|attention_probs_dropout_prob=0.4|
+|roberta-large|3|72.4575|76.8794|0.15319|hidden_dropout_prob=0.2|
+|roberta-large|4|71.2468|75.8546|0.09478|hidden_dropout_prob=0.3|
+|roberta-large|3|71.5643|77.1326|0.15553|hidden_dropout_prob=0.3|
+ 
+<br>
+
+## 최종 Model 선택
 
 <div align='center'>
 
 |  | 모델 | 데이터 | 비율 |
-|:---:|:---|:---|:---:|
-| **A** | snunlp/KR-ELECTRA-discriminator | train+dev (shuffle 8:2) | 0.3 |
-| **B** | snunlp/KR-ELECTRA-discriminator (stacking) | train + swap data | 0.2 |
-| **C** | beomi/KcELECTRA-base | train + swap data | 0.2 |
-| **D** | team-lucid/deberta-v3-xlarge-korean | train data | 0.3 |
-| **E** | xlm-roberta-large (PERSON 토큰 추가) | train data | 0.1 |
+
 
 </div>
+
+## 앙상블
 
 ## 최종결과
 
