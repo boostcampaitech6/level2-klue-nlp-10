@@ -65,14 +65,10 @@
 
 ### 소프트웨어 및 라이브러리
 ```
-python==3.10.13
-torch==2.1.0
-pytorch-lightning==2.1.2
-transformers==4.35.2
-pandas==2.1.3
-pyprnt==2.5.3
-wget==3.2
-wandb==0.16.1
+pandas==1.1.5
+scikit-learn~=0.24.1
+transformers==4.10.0
+torch==1.10.0
 ```
 ### GitHub
 현업에서 진행하는 방식을 최대한 따르려고 노력했습니다. 이슈와 PR 템플릿을 작성하고, 팀 내의 커밋 컨벤션 규칙을 작성하여 후에 봐도 통일된 모습으로 쉽게 변경 사항을 찾을 수 있도록 했습니다. 기본 템플릿을 main 브랜치로 둔 뒤에, dev 브랜치에서 개발을 진행하였습니다. dev 브랜치에서도 새로운 기능을 개발할 때는 새로운 브랜치로 분기를 만들어 진행한 뒤 작성이 끝나면 dev으로 리퀘스트를 작성하고, 팀원의 리뷰를 받은 뒤 병합을 진행하였습니다.
@@ -251,7 +247,7 @@ Focal Loss Function을 사용하면 라벨 불균형 문제를 완화할 수 있
 |roberta-large|3|72.4575|76.8794|0.15319|hidden_dropout_prob=0.2|
 |roberta-large|4|71.2468|75.8546|0.09478|hidden_dropout_prob=0.3|
 |roberta-large|3|71.5643|77.1326|0.15553|hidden_dropout_prob=0.3|
- 
+</div>
 <br>
 
 ## 최종 Model 선택
