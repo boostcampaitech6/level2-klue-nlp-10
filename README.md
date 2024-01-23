@@ -19,7 +19,7 @@
 
 ## 리더보드 결과
 <div align="left">
-    <img src='https://img.shields.io/badge/RE_Public_LB-4️⃣-yellow_green'></img> <img src='https://img.shields.io/badge/STS_Private_LB-3️⃣-yellow_green'></img>
+    <img src='https://img.shields.io/badge/RE_Public_LB-4️⃣-8A2BE2'></img> <img src='https://img.shields.io/badge/STS_Private_LB-3️⃣-8A2BE2'></img>
     <br>
     <img src='https://github.com/boostcampaitech6/level2-klue-nlp-10/blob/main/img/leaderboard.png?raw=true'></img>
 </div>
@@ -27,9 +27,9 @@
 ## Fin-GPT
 <div align='center'>
 
-|권예진 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/Becky-Kwon)|문지원 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/Becky-Kwon)|방제형 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/C7C4FF)|이경재 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/EbanLee)|이종원 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/alwaysday4u)|
+|권예진 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/Becky-Kwon)|문지원 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/jwmooon)|방제형 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/BJH9)|이경재 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/EbanLee))|이종원 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/jongwoncode)|
 |:-:|:-:|:-:|:-:|:-:|
-|<img src='img/yejin.jpg' height=160 width=125></img>|<img src='img/becky_full.jpg' height=160 width=125></img>|<img src='img/kjg.png' height=160 width=125></img>|<img src='img/KakaoTalk_20240103_170830055짜른거.jpg' height=160 width=125></img>|<img src='img/syl.png' height=160 width=125></img>|
+|<img src='img/yejin.jpg' height=160 width=125></img>|<img src='img/jwmoon.jpg' height=160 width=125></img>|<img src='img/kjg.png' height=160 width=125></img>|<img src='img/KakaoTalk_20240103_170830055짜른거.jpg' height=160 width=125></img>|<img src='img/jongwon.jpg' height=160 width=125></img>|
 
 </div>
 
@@ -84,7 +84,8 @@ wandb==0.16.1
 ### 프로젝트 템플릿
 주어진 Baseline 코드는 모델, 데이터로더, 학습까지 하나의 파일에 전부 작성되어 있었습니다. 앞으로 진행할 다른 대회에도 사용할 수 있도록 프로젝트 템플릿을 작성하여 그에 맞게 모듈화하여 구획하였습니다. 디렉토리는 원활한 실험을 위한 설정 파일을 담은 config, 학습, 검증, 평가, 증강 데이터를 담은 data, 학습이 끝난 모델과 inference 결과를 저장하는 output, 학습된 모델의 파라미터를 저장하는 checkpoint, Jupyter Notebook 작업을 수행하는 notebook, 데이터 전처리와 증강 등 다양한 곳에 사용한 모듈을 저장하는 utils으로 구분했습니다. 
 ```
-📦 level1-semantictextsimilarity-nlp-04
+public 전환 후 그려질 예정
+📦 level2-KLUE-nlp-10
 ├─ .gitihub
 │  ├─ ISSUE_TEMPLATE
 │  │  ├─ bug_report.md
@@ -128,50 +129,60 @@ wandb==0.16.1
 
 <div align='center'>
 
-<img src='img/roadmap.png'></img>
+<img src='img/프로젝트 로드맵.png'></img>
 
 </div>
 
 ## 데이터 
-### **Source 별 데이터셋 특징**
-데이터셋의 출처는 총 3가지 source로 구성되어 있습니다. 먼저 petition 데이터셋은 국민청원 게시판 제목 데이터로, 대체로 오탈자가 적은 격식체의 문장들로 구성되어 있습니다. NSMC(Naver Sentiment Movie Corpus) 데이터셋은 네이버 영화 감성 분석 코퍼스로, 문어체와 구어체가 섞여 있었고, 일부 문장에서 특수문자가 발견되었습니다. Slack 데이터셋은 Upstage에서 제공한 slack 데이터셋으로, 전반적으로 구어체의 문장으로 구성되어 있었으며, 오탈자와 함께 문장 부호, 특수문자(이모티콘, 이모지 등)가 발견되었습니다.
-
-<div align='center'>
-
-| channel | sentence_1 | sentence_2 |
-|:---:|:---|:---|
-| **nsmc** | 혹평하신분들은 로맨틱코메디를 얼마나 심오하게 보시는분들인지는 모르겠지만 개인적으로는 가볍게 기분좋게 보기 좋은 영화라고 생각합니다.. | 로맨틱코미디를 비판하는 사람들이 얼마나 심한지는 모르겠지만 개인적으로는 가볍게 보기 좋은 영화라고 생각한다. |
-|  | 울면서 본 영화다. | 울컥 하면서 보는 드라마입니다. |
-|  | 킹콩이면 도대체 콩진호가 얼마나 큰 건가요? | . 콩진호가 나가신다! |
-| **petition** | 심평원, 한전 회식카드지출비 해외출장비 지원자금 조사의뢰 건 | 공동주택 일자리안정자금에 대한 문제점(미화원, 경비원 2019년 임금 동결건) |
-|  | 고등학생도 휴업 해주세요. | 근로자의 휴식권을 찾아주세요.. |
-|  | 청소년법 폐지 간곡히 요청합니다 | 청소년보호법 폐지 간곡히 부탁드립니다. |
-| **slack** | 제가 모르는 종목도 많이 알고 계셨습니다. | 제가 있던 테이블에서도 너무나 가슴 뛰는 아이디어도 많이 나누었습니다. |
-|  | 두 분 어디 도장깨기 하러 가시는가요… ㅋㅋㅋ | 둘이 봉인을 어디서 뜯으려나... 하하하 |
-|  | 너무 감사드립니다 ㅠㅠ | 너무 부럽습니다 ㅠㅠ |
-
-</div>
-
 ### Label 별 데이터셋 특징
 
 <div align='center'>
 
-| Label 구간 | sentence_1 | sentence_2 | 특징 |
-|:---:|:---|:---|:---|
-| 5.0 | 검정고시가 페지되어야 한다고 봅니다 | 검정고시 페지해야 한다고 봅니다 | 문장부호의 개수 및 띄어쓰기, 조사가 생략되거나 하는 다소의 차이가 존재하나, 문장이 거의 일치합니다. |
-| 4.0 ~ 4.9 | 나는 이걸 왜 보았을까?? | 이거 내가 왜 봤지? | 문장의 의미가 거의 일치하나, 단어의 어순이 다르거나 일부 단어가 유의어로 교체되었습니다. |
-| 3.0 ~ 3.9 | 히딩크감독을 다시 대한민국 축구 감독으로 | 히딩크감독님을 모셔와야합니다 | 문장의 맥락이 거의 일치하나, 주요한 보어 혹은 목적어가 누락되거나 유의어 대체 등에서 뚜렷한 차이를 보입니다. |
-| 2.0 ~ 2.9 | 대회 때문에 정신 없어서 오늘 올립니다. | 오늘은 대회로 바쁘지 않아서 올립니다. | 문장에서 다루는 주제와 상황은 유사하지만, 읽는 사람에 따라 다르게 해석될 여지가 있습니다. |
-| 1.0 ~ 1.9 | 다크나이트와 함께 최고의 히어로물 | 히트했던 드라마인 각시탈 또한 제대로된 히어로물입니다; | 일부 단어가 일치하거나 주제는 유사하지만, 서로 다른 의미를 가지는 문장입니다. |
-| 0.1 ~ 0.9 | 공짜로 주어지는 것은 아무 것도 없다. | 아무 것도 남는게 없다.. | 일부 단어는 일치하나, 맥락과 의미가 전혀 다릅니다. |
-| 0.0 | 부모님 댁으로 받았는데 너무 맛있다고 하셔요!! ㅎㅎㅎ | 타고 싶은데 넘 비싸요 ㅎㅎ | 공통점이 없는 전혀 다른 문장입니다. |
+|id|sentence|subject_entity|object_entity|label|source|
+|--|--|--|--|--|--|
+|0|〈Something〉는 조지 해리슨이 쓰고 비틀즈가 1969년 앨범 《Abbey Road》에 담은 노래다.|"{'word': '비틀즈', 'start_idx': 24, 'end_idx': 26, 'type': 'ORG'}"|"{'word': '조지 해리슨', 'start_idx': 13, 'end_idx': 18, 'type': 'PER'}"|**no_relation**|wikipedia|
+|1|호남이 기반인 바른미래당·대안신당·민주평화당이 우여곡절 끝에 합당해 민생당(가칭)으로 재탄생한다.|"{'word': '민주평화당', 'start_idx': 19, 'end_idx': 23, 'type': 'ORG'}"|"{'word': '대안신당', 'start_idx': 14, 'end_idx': 17, 'type': 'ORG'}"|**no_relation**|wikitree|
+|2|"이른바 'Z세대'로 불리는 1990년대 중반 이후 태어난 세대에게 대표 아이콘으로 통하는 미국 싱어송라이터 빌리 아일리시(본명 빌리 오코널, 19)가 팝 역사를 새로 썼다."|"{'word': '빌리 아일리시', 'start_idx': 60, 'end_idx': 66, 'type': 'PER'}"|"{'word': '싱어송라이터', 'start_idx': 53, 'end_idx': 58, 'type': 'POH'}"|**per:title**|wikitree|
 
 </div>
 
+### Validation set 생성과 최종 데이터셋 확정
+<div align='center'>
+<img src='img/validation.png'></img>
+</div>
+
+### 데이터 증강
+Back translation 방식을 활용했다. Google API로 한글을 영어로 번역한 뒤, 다시 한글로 번역하여 새로운 문장을 생성했다. 
+
+## 데이터 전처리와 성능 확인
+### Marker 사용
+데이터의 라벨이 entity type과 밀접한 연관이 있다는 인사이트에 근거하여 sentence에 entity type 정보를 넣어줄수 있는 방법을 모색하고자 Marker를 사용
+
+|**Prompt type**|**Input example**|**micro-f1**|
+|:--:|--|--|
+|**s_sep_o**|이순신[SEP]무신[SEP]이순신은 조선 중기의 무신이다.|70.75|
+|**s_and_o(와)**|이순신과 무신의 관계[SEP]이순신은 조선 중기의 무신이다.|72.51|
+|**s_sep_o(&)**|이순신 & 무신의 관계[SEP]이순신은 조선 중기의 무신이다.|72.49|
+|**question**|이순신은 조선 중기의 무신이다.[SEP]이순신과 무신의 관계는 무엇입니까?|72.22|
+
+### prompt 활용
+|**Marker Type**|**Input Example**|**micro-f1**|
+|--|--|--|
+|**Basline**|이순신은 조선의 무신이다.|72.51|
+|**Entity Mask**|[SUB-PER]은 조선의 [OBJ-JOB] 이다.|-|
+|**Entity Marker**|[E1] 이순신 [/E1]은 조선의 [E2] 무신 [/E2]이다.|-|
+|**Entity Marker Punct**|@ 이순신 @ 은 조선의 # 무신 # 이다.|-|
+|**Typed Entity Marker**|<S:PERSON> 이순신 </S:PERSON>은 조선의 <O:JOB> 무신 </O:JOB>이다.|72.78|
+|**Typed Entity Marker Punct**|@ * 사람 * 이순신 @은 조선의 # ^ 직업 ^ 무신 # 이다.|73.45|
+|**Typed Entity Marker PunctV2**|@ * 사람 * 이순신 @은 조선의 $ ^ 직업 ^ 무신 $ 이다.|73.73|
+|**Typed Entity Marker Non Object Type**|<S:PERSON> 이순신 </S:PERSON>은 조선의 <O> 무신 </O>이다.|72.93|
+
+
 ## 아키텍쳐 보완
 
-### Stacking 구현
-데이터에 주어진 ‘binary-label’을 활용하여 회귀와 이진 분류를 동시에 수행하는 모델을 만들었습니다. 이진 분류를 통해 예측 범위를 좁혀 보다 정밀한 예측을 기대했습니다. Stacking은 매개변수 공유 여부에 따라 두 가지 방식으로 구현했습니다. 매개변수 공유가 있는 경우에는 하나의 모델을 사용했습니다. AutoModel의 출력은 Classification head에서 0 또는 1로 분류되고, 해당하 Regression head로 전파됩니다. 매개변수 공유가 없는 경우에는 두 개의 모델을 사용했습니다. 하나의 모델 출력을 사용하여 이진 분류를 수행한 뒤, 다른 모델의 출력값을 이 분류에 맞게 Regression head로 전달합니다. 두 방식의 성능은 대체로 비슷했습니다. 매개변수 공유가 있는 방식은 학습 속도가 빠르고, 매개변수 공유가 없는 방식은 과적합에 있어 안정적인 모습을 보였습니다. 하지만 두 방식 모두 validation 과정에서 상당한 과적합이 나타났습니다. 특히 사전 학습 모델의 규모가 커질수록 이러한 문제가 두드러졌습니다. 이는 모델이 복잡해질 때 나타나는 특징으로 보입니다.
+### Matching the Blank (MTB) 구현
+
+### RECETNT
 
 ### K-fold 구현
 과적합을 방지하기 위해 K-fold 교차 검증을 시행했습니다. Ttrain 데이터는 5개의 폴드로 나누었고, 기존의 dev 데이터는 최종 학습 평가에 사용했습니다. 하지만 결과는 기대에 미치지 못했습니다. 일부 폴드에서는 적은 에포크 후에 학습이 조기 종료되었고, 매우 낮은 성능을 보였습니다. 이는 앞서 언급한 대로, train 데이터의 불균형 때문으로 추정됩니다.
@@ -209,3 +220,4 @@ wandb==0.16.1
 | 🥇 | Private Score (최종) | 0.9428 |
 
 </div>
+
