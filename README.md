@@ -7,20 +7,19 @@
 
 
 ## **개요**
-> 진행 기간: 23년 12월 13일 ~ 23년 12월 21일
+> 진행 기간: 24년 1월 3일 ~ 24년 1월 18일
 
 > 데이터셋: 
-> - 학습 데이터셋 9,324개
-> - 검증 데이터셋 550개
-> - 평가 데이터는 1,100개  
+> - 학습 데이터셋 32,470개
+> - 평가 데이터는 7,765개  
 >
 > 평가 데이터의 50%는 Public 점수 계산에 활용되어 실시간 리더보드에 표기가 되고, 남은 50%는 Private 결과 계산에 활용되었습니다.
 
-부스트캠프AI Tech 6기의 6주 차, 7주 차 과정으로 NLP 기초 대회입니다. 주제는 ‘문장 간 유사도 측정’으로, 두 문장이 얼마나 유사한지를 수치화하는 자연어처리 N21 태스크인 의미 유사도 판별(Semantic Text Similarity, 이하 STS)을 진행했습니다. 학습 데이터에 주어진 문장 두 개와 유사도 점수를 기반으로 평가 데이터의 두 문장 간의 유사도를 0과 5 사이의 값으로 예측하는 모델을 구축하였습니다.
+부스트캠프AI Tech 6기의 9, 10, 11주 차 과정으로 NLP KLUE 대회입니다. 주제는 ‘문장 내 개체간 관계 추출’으로, 문장의 단어(Entity)에 대한 속성과 관계를 예측하는 자연어처리 N21 태스크인 관계 추출(Relation Extraction, RE)을 진행했습니다. 문장과 문장 내 subject_entity와 object_entity가 주어졌을 때 두 entity의 관계를 주어진 30개의 라벨 중 하나로 분류하는 task를 수행했습니다. `no-relation` 라벨을 제외한 **micro-f1 score**와 **auprc**로 평가합니다.
 
 ## 리더보드 결과
 <div align="left">
-    <img src='https://img.shields.io/badge/STS_Public_LB-🥇-yellow_green'></img> <img src='https://img.shields.io/badge/STS_Private_LB-🥇-yellow_green'></img>
+    <img src='https://img.shields.io/badge/RE_Public_LB-4️⃣-yellow_green'></img> <img src='https://img.shields.io/badge/STS_Private_LB-3️⃣-yellow_green'></img>
     <img src='img/leaderboard.png'></img>
 </div>
 
