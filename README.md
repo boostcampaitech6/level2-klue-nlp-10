@@ -256,25 +256,30 @@ Focal Loss Function을 사용하면 라벨 불균형 문제를 완화할 수 있
 
 ## 최종 Model 선택
 
-<div align='center'>
-
-|  | 모델 | 데이터 | 비율 |
-
-
-</div>
+- 이번 RE 테스크는 KLUE 데이터셋을 활용하여 진행했기에 klue 데이터로 fine-tunning된 모델에서 좋은 성능을 보였습니다. 특히, klue/RoBERTa-large가 다른 모델에 비해 높은 성능을 보였습니다.
+- 추가로 저희 팀에서는 klue/RoBERTa-base, klue/RoBERTa-large, klue/bert-base, monologg/KoELECTRA-base-v3-discriminator, vaiv/kobigbird-roberta-large, team-lucid/deberta-v3-base-korean, wooy0ng/korquad1-klue-roberta-large, kakaobank/kf-deberta-base 모델들을 실험했습니다.
 
 ## 앙상블
+최종적으로 6개의 모델을 앙상블에 사용하였습니다.
+
+<div align='center'>
+
+|**Model**|**prompt**|**marker**|**특징**|**Public micro-f1**|**Ensemble Weight**|
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|**klue/RoBERTa-large**|**question**|**typed entity marker punct**||73.06|0.17|
+|**klue/RoBERTa-large**|**s_and_o(&)**|no marker||72.22|0.15|
+|**klue/RoBERTa-large**|**s_and_o(와)**|no marker||72.51|0.17|
+|**klue/RoBERTa-large**|**s_and_o(와)**|**typed entity marker punct**||73.45|0.17|
+|**klue/RoBERTa-large**|**s_and_o(와)**|**typed entity marker punct**|**K-Fold**|73.34|0.17|
+|**klue/RoBERTa-large**|**s_and_o(와)**|**typed entity marker punctV2**||73.73|0.17|
+</div>
 
 ## 최종결과
 
-> **총 제출 횟수: 56**
+> **총 제출 횟수: 132**
 
 <div align='center'>
-
-| 순위 | 분류 | 점수(Pearson Correlation) |
-|:---:| --- |:---:|
-| 🥇 | Public Score (대회 진행) | 0.9374 |
-| 🥇 | Private Score (최종) | 0.9428 |
-
+<img src='img/leaderboard.png'></img>
+<img src='img/leaderboard2.png'></img>
 </div>
 
