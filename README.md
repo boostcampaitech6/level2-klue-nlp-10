@@ -29,7 +29,7 @@
 
 |권예진 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/Becky-Kwon)|문지원 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/Becky-Kwon)|방제형 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/C7C4FF)|이경재 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/doodaad)|이종원 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/alwaysday4u)|
 |:-:|:-:|:-:|:-:|:-:|
-|<img src='img/yejin.jpg' height=125 width=125></img>|<img src='img/becky_full.jpg' height=125 width=125></img>|<img src='img/kjg.png' height=125 width=125></img>|<img src='img/KakaoTalk_20240103_170830055짜른거.jpg' height=125 width=125></img>|<img src='img/syl.png' height=125 width=125></img>|
+|<img src='img/yejin.jpg' height=160 width=125></img>|<img src='img/becky_full.jpg' height=160 width=125></img>|<img src='img/kjg.png' height=160 width=125></img>|<img src='img/KakaoTalk_20240103_170830055짜른거.jpg' height=160 width=125></img>|<img src='img/syl.png' height=160 width=125></img>|
 
 </div>
 
@@ -39,12 +39,11 @@
 
 |팀원| 역할 |
 |:---:| --- |
-| 구희찬 | 데이터 증강 기법 탐색 및 실험, 데이터 분포 시각화 및 앙상블 유틸리티 생성, 파인 튜닝 |
-| 권예진 | 모델 탐색 및 실험, 베이스라인 관리, 분류 코드 관리 총괄, 기계번역 데이터 증강 및 앙상블 실험 |
-| 김진기 | 개발, 협업 환경 및 베이스라인 관리, 데이터 분포 관리, 모델 탐색 및 실험, 앙상블 코드 작성 및 실험 |
-| 김희범 | 개발, 협업 환경 및 베이스라인 관리, 데이터 품질 관리 및 실험, 모델 탐색 및 실험 |
-| 박준우 | 모델 탐색 및 실험, 다중 분류 코드 작성, 기계번역 데이터 증강 및 실험 |
-| 손유림 | 데이터 증강 코드 작성 및 모듈 관리, 분류 코드 실험 보조, 기계번역 데이터 증강 및 실험 |
+| 권예진 | EDA, validation set 구성, 앙상블 실험, K-Fold, marker 실험, GitHub 이슈및 main PR관리 |
+| 문지원 | 모델 탐색 및 실험, EDA, focal loss 구현 및 실험, WandB logging 구현 |
+| 방제형 | EDA, 데이터 증강 방법 탐색 및 실험, GitHub main PR 관리, 개체 타입 제한 실험 |
+| 이경재 | 모델 탐색 및 실험, prompt 실험, entity embedding 구현 및 실험, dropout rate 실험 |
+| 이종원 | 코드 리팩토링 및 관리, 전처리 및 prompt, marker 실험, matching the blanks 실험 |
 
 </div>
 
@@ -55,14 +54,14 @@
 
 <div align='center'>
 
-<img src='img/structure.png'></img>
+<img src='img/프로젝트 구조도.png'></img>
 
 </div>
 
 ## 개발/협업 환경
 
 ### 하드웨어
-> **Tesla V100 32GB** * 6EA
+> **Tesla V100 32GB** * 5EA
 
 ### 소프트웨어 및 라이브러리
 ```
@@ -72,15 +71,14 @@ pytorch-lightning==2.1.2
 transformers==4.35.2
 pandas==2.1.3
 pyprnt==2.5.3
-PyYAML==6.0
 wget==3.2
 wandb==0.16.1
 ```
 ### GitHub
-현업에서 진행하는 방식을 최대한 따르려고 노력했습니다. 이슈와 PR 템플릿을 작성하고, 팀 내의 커밋 컨벤션 규칙을 작성하여 후에 봐도 통일된 모습으로 쉽게 변경 사항을 찾을 수 있도록 했습니다. 기본 템플릿을 main 브랜치로 둔 뒤에, develop 브랜치에서 개발을 진행하였습니다. develop 브랜치에서도 새로운 기능을 개발할 때는 새로운 브랜치로 분기를 만들어 진행한 뒤 작성이 끝나면 develop으로 리퀘스트를 작성하고, 팀원의 리뷰를 받은 뒤 병합을 진행하였습니다.
+현업에서 진행하는 방식을 최대한 따르려고 노력했습니다. 이슈와 PR 템플릿을 작성하고, 팀 내의 커밋 컨벤션 규칙을 작성하여 후에 봐도 통일된 모습으로 쉽게 변경 사항을 찾을 수 있도록 했습니다. 기본 템플릿을 main 브랜치로 둔 뒤에, dev 브랜치에서 개발을 진행하였습니다. dev 브랜치에서도 새로운 기능을 개발할 때는 새로운 브랜치로 분기를 만들어 진행한 뒤 작성이 끝나면 dev으로 리퀘스트를 작성하고, 팀원의 리뷰를 받은 뒤 병합을 진행하였습니다.
 
 ### Notion
-메인 보드를 두고, 그곳에 자신의 업무 페이지를 작성하여 담당자를 할당한 후, 태그를 준비/진행 중/완료로 나누어 진 행 상황을 공유했습니다. 해당 페이지에는 본인의 작업 기간을 표시하여 타임라인으로도 활용했습니다. 가독성과 집중을 위해 대회 1주 차에 작성된 것들은 따로 탭을 만들어 저장하여 주마다 주요한 것들을 바로 확인할 수 있도록 했습니다.
+메인 Task 보드를 두고, 그곳에 자신의 업무 페이지를 작성하여 담당자를 할당한 후, 태그를 준비/진행 중/완료로 나누어 진 행 상황을 공유했습니다. 해당 페이지에는 본인의 작업 기간을 표시하여 타임라인으로도 활용했습니다.
 그리고 정보와 자료의 공유 공간으로 사용했습니다. 자신은 익숙하지만, 팀원들은 모를 수 있는 팁을 직접 작성하기도 하고, 팀원들이 읽어봤으면 하는 레퍼런스를 공유했습니다.
 
 ### 프로젝트 템플릿
