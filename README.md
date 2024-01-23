@@ -20,15 +20,16 @@
 ## 리더보드 결과
 <div align="left">
     <img src='https://img.shields.io/badge/RE_Public_LB-4️⃣-yellow_green'></img> <img src='https://img.shields.io/badge/STS_Private_LB-3️⃣-yellow_green'></img>
-    <img src='img/leaderboard.png'></img>
+    <br>
+    <img src='https://github.com/boostcampaitech6/level2-klue-nlp-10/blob/main/img/leaderboard.png?raw=true'></img>
 </div>
 
-## 해결사
+## Fin-GPT
 <div align='center'>
 
-|구희찬 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/kooqooo)|권예진 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/Becky-Kwon)|김진기 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/jingi-data)|김희범 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/C7C4FF)|박준우 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/doodaad)|손유림 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/alwaysday4u)|
-|:-:|:-:|:-:|:-:|:-:|:-:|
-|<img src='img/kooqooo.jpg' height=125 width=125></img>|<img src='img/becky_full.jpg' height=125 width=125></img>|<img src='img/kjg.png' height=125 width=125></img>|<img src='img/beom.jpg' height=125 width=125></img>|<img src='img/pjw.jpg' height=125 width=125></img>|<img src='img/syl.png' height=125 width=125></img>|
+|권예진 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/Becky-Kwon)|문지원 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/Becky-Kwon)|방제형 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/C7C4FF)|이경재 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/doodaad)|이종원 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/alwaysday4u)|
+|:-:|:-:|:-:|:-:|:-:|
+|<img src='img/yejin.jpg' height=125 width=125></img>|<img src='img/becky_full.jpg' height=125 width=125></img>|<img src='img/kjg.png' height=125 width=125></img>|<img src='img/pjw.jpg' height=125 width=125></img>|<img src='img/syl.png' height=125 width=125></img>|
 
 </div>
 
