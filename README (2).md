@@ -29,7 +29,7 @@
 
 |권예진 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/Becky-Kwon)|문지원 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/jwmooon)|방제형 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/BJH9)|이경재 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/EbanLee))|이종원 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/jongwoncode)|
 |:-:|:-:|:-:|:-:|:-:|
-|<img src='img/yejin.jpg' height=160 width=125></img>|<img src='img/jwmoon.jpg' height=160 width=125></img>|<img src='img/kjg.png' height=160 width=125></img>|<img src='img/KakaoTalk_20240103_170830055짜른거.jpg' height=160 width=125></img>|<img src='img/jongwon.jpg' height=160 width=125></img>|
+|<img src='img/yejin.jpg' height=160 width=125></img>|<img src='img/jwmoon.jpg' height=160 width=125></img>|<img src='img/방제형.png' height=160 width=125></img>|<img src='img/KakaoTalk_20240103_170830055짜른거.jpg' height=160 width=125></img>|<img src='img/jongwon.jpg' height=160 width=125></img>|
 
 </div>
 
@@ -154,8 +154,7 @@ public 전환 후 그려질 예정
 ### 데이터 증강
 Back translation 방식을 활용했다. Google API로 한글을 영어로 번역한 뒤, 다시 한글로 번역하여 새로운 문장을 생성했다. 
 
-
-
+<br>
 
 ## 데이터 전처리와 성능 확인
 ### Marker 사용
@@ -180,6 +179,8 @@ Back translation 방식을 활용했다. Google API로 한글을 영어로 번�
 |**Typed Entity Marker PunctV2**|@ * 사람 * 이순신 @은 조선의 $ ^ 직업 ^ 무신 $ 이다.|73.73|
 |**Typed Entity Marker Non Object Type**|<S:PERSON> 이순신 </S:PERSON>은 조선의 <O> 무신 </O>이다.|72.93|
 
+<br>
+
 
 ## 아키텍쳐 보완
 
@@ -198,10 +199,15 @@ Matching the blanks는 CLS 토큰 대신, Entity에 해당하는 token을 사용
 |typed entity marker|no|72.78|
 |typed entity marker|entity start|73.38|
 |typed entity marker|entity start end|73.70|
-</div>\
+</div>
 
 
-### RECETNT
+### Relation Classification with Entity Type Restriction (RECETNT) 구현
+subject entity type과 object entity type의 조합이 추출해낼 수 있는 relation 유형이 제한되어 있으므로, Relation classification을 위해 entity type의 조합을 classifier에서 한정하는 방법론이다. 
+<div align='center'>
+<img src='img/RECENT.png'></img>
+</div>
+
 
 ### K-fold 구현
 과적합을 방지하기 위해 K-fold 교차 검증을 시행했습니다. Ttrain 데이터는 5개의 폴드로 나누었고, 기존의 dev 데이터는 최종 학습 평가에 사용했습니다. 하지만 결과는 기대에 미치지 못했습니다. 일부 폴드에서는 적은 에포크 후에 학습이 조기 종료되었고, 매우 낮은 성능을 보였습니다. 이는 앞서 언급한 대로, train 데이터의 불균형 때문으로 추정됩니다.
