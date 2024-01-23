@@ -275,7 +275,7 @@ Focal Loss Function을 사용하면 라벨 불균형 문제를 완화할 수 있
 > **총 제출 횟수: 132**
 
 <div align='center'>
-<img src='img/leaderboard.png'></img>
-<img src='img/leaderboard2.png'></img>
+<img src='img/leaderboard.png' height=180 width=700></img>
+<img src='img/leaderboard2.png' height=80 width=700></img>
 </div>
 
