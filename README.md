@@ -1,5 +1,3 @@
-<div align='center'>
-
 # Lv.2 NLP KLUE 프로젝트 : 문장 내 개체간 관계 추출(RE)
 
 </div>
@@ -15,7 +13,7 @@
 >
 > 평가 데이터의 50%는 Public 점수 계산에 활용되어 실시간 리더보드에 표기가 되고, 남은 50%는 Private 결과 계산에 활용되었습니다.
 
-부스트캠프AI Tech 6기의 9, 10, 11주 차 과정으로 NLP KLUE 대회입니다. 주제는 ‘문장 내 개체간 관계 추출’으로, 문장의 단어(Entity)에 대한 속성과 관계를 예측하는 자연어처리 N21 태스크인 관계 추출(Relation Extraction, RE)을 진행했습니다. 문장과 문장 내 subject_entity와 object_entity가 주어졌을 때 두 entity의 관계를 주어진 30개의 라벨 중 하나로 분류하는 task를 수행했습니다. `no-relation` 라벨을 제외한 **micro-f1 score**와 **auprc**로 평가합니다.
+부스트캠프AI Tech 6기의 9~11주 차 과정인 NLP KLUE 대회입니다. 주제는 ‘문장 내 개체간 관계 추출’으로, 문장의 단어(Entity)에 대한 속성과 관계를 예측하는 자연어처리 N21 태스크인 관계 추출(Relation Extraction, RE)을 진행했습니다. 문장과 문장 내 subject_entity와 object_entity가 주어졌을 때 두 entity의 관계를 주어진 30개의 라벨 중 하나로 분류하는 task를 수행했습니다. `no-relation` 라벨을 제외한 **micro-f1 score**와 **auprc**로 평가합니다.
 
 ## 리더보드 결과
 <div align="left">
@@ -27,7 +25,7 @@
 ## Fin-GPT
 <div align='center'>
 
-|권예진 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/Becky-Kwon)|문지원 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/jwmooon)|방제형 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/BJH9)|이경재 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/EbanLee))|이종원 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/jongwoncode)|
+|권예진 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/Becky-Kwon)|문지원 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/jwmooon)|방제형 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/BJH9)|이경재 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/EbanLee)|이종원 [<img src="img/github-mark.png" width="20" style="vertical-align:middle;">](https://github.com/jongwoncode)|
 |:-:|:-:|:-:|:-:|:-:|
 |<img src='img/yejin.jpg' height=160 width=125></img>|<img src='img/jwmoon.jpg' height=160 width=125></img>|<img src='img/방제형.png' height=160 width=125></img>|<img src='img/KakaoTalk_20240103_170830055짜른거.jpg' height=160 width=125></img>|<img src='img/jongwon.jpg' height=160 width=125></img>|
 
@@ -71,10 +69,10 @@ transformers==4.10.0
 torch==1.10.0
 ```
 ### GitHub
-현업에서 진행하는 방식을 최대한 따르려고 노력했습니다. 이슈와 PR 템플릿을 작성하고, 팀 내의 커밋 컨벤션 규칙을 작성하여 후에 봐도 통일된 모습으로 쉽게 변경 사항을 찾을 수 있도록 했습니다. 기본 템플릿을 main 브랜치로 둔 뒤에, dev 브랜치에서 개발을 진행하였습니다. dev 브랜치에서도 새로운 기능을 개발할 때는 새로운 브랜치로 분기를 만들어 진행한 뒤 작성이 끝나면 dev으로 리퀘스트를 작성하고, 팀원의 리뷰를 받은 뒤 병합을 진행하였습니다.
+현업에서 진행하는 방식을 최대한 따르려고 노력했습니다. 이슈와 PR 템플릿을 작성하고, 팀 내의 커밋 컨벤션 규칙을 작성하여 후에 봐도 통일된 모습으로 쉽게 변경 사항을 찾을 수 있도록 했습니다. 기본 템플릿을 main 브랜치로 둔 뒤에, dev 브랜치에서 개발을 진행하였습니다. dev 브랜치에서도 새로운 기능을 개발할 때는 새로운 브랜치로 분기를 만들어 진행한 뒤 작성이 끝나면 dev 브랜치로 Pull Request를 작성하고, 팀원의 리뷰를 받은 뒤 병합을 진행하였습니다.
 
 ### Notion
-메인 Task 보드를 두고, 그곳에 자신의 업무 페이지를 작성하여 담당자를 할당한 후, 태그를 준비/진행 중/완료로 나누어 진 행 상황을 공유했습니다. 해당 페이지에는 본인의 작업 기간을 표시하여 타임라인으로도 활용했습니다.
+메인 Task 보드를 두고, 그곳에 자신의 업무 페이지를 작성하여 담당자를 할당한 후, 태그를 준비/진행 중/완료로 나누어 진행 상황을 공유했습니다. 해당 페이지에는 본인의 작업 기간을 표시하여 타임라인으로도 활용했습니다.
 그리고 정보와 자료의 공유 공간으로 사용했습니다. 자신은 익숙하지만, 팀원들은 모를 수 있는 팁을 직접 작성하기도 하고, 팀원들이 읽어봤으면 하는 레퍼런스를 공유했습니다.
 
 ### 프로젝트 템플릿
@@ -150,13 +148,14 @@ public 전환 후 그려질 예정
 </div>
 
 ### 데이터 증강
-Back translation 방식을 활용했다. Google API로 한글을 영어로 번역한 뒤, 다시 한글로 번역하여 새로운 문장을 생성했다. 
+Back translation 방식을 활용하여 Google API로 한글을 영어로 번역한 뒤, 다시 한글로 번역하여 새로운 문장을 생성했습니다. 
 
 <br>
 
 ## 데이터 전처리와 성능 확인
 ### Marker 사용
-데이터의 라벨이 entity type과 밀접한 연관이 있다는 인사이트에 근거하여 sentence에 entity type 정보를 넣어줄수 있는 방법을 모색하고자 Marker를 사용
+데이터의 라벨이 entity type과 밀접한 연관이 있다는 인사이트에 근거하여 sentence에 entity type 정보를 넣어줄수 있는 방법을 모색하고자 Marker를 사용하여 전처리했습니다.
+<div align='center'>
 
 |**Prompt type**|**Input example**|**micro-f1**|
 |:--:|--|--|
@@ -164,8 +163,12 @@ Back translation 방식을 활용했다. Google API로 한글을 영어로 번�
 |**s_and_o(와)**|이순신과 무신의 관계[SEP]이순신은 조선 중기의 무신이다.|72.51|
 |**s_sep_o(&)**|이순신 & 무신의 관계[SEP]이순신은 조선 중기의 무신이다.|72.49|
 |**question**|이순신은 조선 중기의 무신이다.[SEP]이순신과 무신의 관계는 무엇입니까?|72.22|
+</div>
 
-### prompt 활용
+### Prompt 활용
+bert기반 pre-trained model을 사용하기 때문에 입력문장의 의미를 어느정도 이해한다고 생각했고, 따라서 문장 앞의 prompt부분을 더 다양한 양식으로 수정해 모델이 더 많은 정보를 이해할 수 있도록 했습니다.
+<div align='center'>
+
 |**Marker Type**|**Input Example**|**micro-f1**|
 |--|--|--|
 |**Basline**|이순신은 조선의 무신이다.|72.51|
@@ -177,12 +180,13 @@ Back translation 방식을 활용했다. Google API로 한글을 영어로 번�
 |**Typed Entity Marker PunctV2**|@ * 사람 * 이순신 @은 조선의 $ ^ 직업 ^ 무신 $ 이다.|73.73|
 |**Typed Entity Marker Non Object Type**|<S:PERSON> 이순신 </S:PERSON>은 조선의 <O> 무신 </O>이다.|72.93|
 
+</div>
 <br>
 
 
 ## 아키텍쳐 보완
 
-### Matching the Blank (MTB) 구현
+### Matching the Blanks 구현
 Matching the blanks는 CLS 토큰 대신, Entity에 해당하는 token을 사용하여 RE task를 수행하여 성능 개선을 도모했다는 연구입니다. 
 "ENTITY MARKERS – ENTITY START"를 구현했고, 뒤에 존재하는 ENTITY MARKER 토큰까지 사용하는 "ENTITY MARKERS – ENTITY START END"를 구현했다. 또한, CLS는 중요한 정보를 담고 있다고 생각했기에 CLS 토큰을 포함하도록 구현했습니다.
 - ENTITY MARKERS - [CLS] (Baseline) : [CLS] 토큰 사용.
@@ -190,7 +194,8 @@ Matching the blanks는 CLS 토큰 대신, Entity에 해당하는 token을 사용
 - ENTITY MARKERS - ENTITY START END + [CLS] : [CLS], [E1], [/E1] 토큰 사용.
 
 <div align='center'>
-<img src='img/mtb.png'></img>
+<img src='img/matching_the_blanks.png' width='800px'></img>
+<p></p>
     
 |marker|matching the blank type |micro-f1|
 |--|--|--|
@@ -200,11 +205,12 @@ Matching the blanks는 CLS 토큰 대신, Entity에 해당하는 token을 사용
 </div>
 
 
-### Relation Classification with Entity Type Restriction (RECETNT) 구현
-subject entity type과 object entity type의 조합이 추출해낼 수 있는 relation 유형이 제한되어 있으므로, Relation classification을 위해 entity type의 조합을 classifier에서 한정하는 방법론이다.
+### Relation Classification with Entity Type Restriction (RECENT) 구현
+subject entity type과 object entity type의 조합이 추출해낼 수 있는 relation 유형이 제한되어 있으므로, Relation classification을 위해 entity type의 조합을 classifier에서 한정하는 방법론입니다.
 
 <div align='center'>
-<img src='img/RECENT.png'></img>
+<img src='img/RECENT.png' width='800px'></img>
+<p></p>
 
 |RECENT|Marker Type|Micro-f1|
 |--|--|--|
@@ -252,7 +258,7 @@ Focal Loss Function을 사용하면 라벨 불균형 문제를 완화할 수 있
 
 ## 최종 Model 선택
 
-- 이번 RE 테스크는 KLUE 데이터셋을 활용하여 진행했기에 klue 데이터로 fine-tunning된 모델에서 좋은 성능을 보였습니다. 특히, klue/RoBERTa-large가 다른 모델에 비해 높은 성능을 보였습니다.
+- 이번 RE task는 KLUE 데이터셋을 활용하여 진행했기에 klue 데이터로 fine-tuning된 모델에서 좋은 성능을 보였습니다. 특히, klue/RoBERTa-large가 다른 모델에 비해 높은 성능을 보였습니다.
 - 추가로 저희 팀에서는 klue/RoBERTa-base, klue/RoBERTa-large, klue/bert-base, monologg/KoELECTRA-base-v3-discriminator, vaiv/kobigbird-roberta-large, team-lucid/deberta-v3-base-korean, wooy0ng/korquad1-klue-roberta-large, kakaobank/kf-deberta-base 모델들을 실험했습니다.
 
 ## 앙상블
